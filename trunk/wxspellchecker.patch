@@ -1,0 +1,16 @@
+Index: include/SpellCheckEngineInterface.h
+===================================================================
+RCS file: /cvsroot/wxcode/wxCode/components/wxspellchecker/include/SpellCheckEngineInterface.h,v
+retrieving revision 1.15
+diff -u -r1.15 SpellCheckEngineInterface.h
+--- include/SpellCheckEngineInterface.h	3 Dec 2005 06:08:35 -0000	1.15
++++ include/SpellCheckEngineInterface.h	14 Sep 2009 21:03:41 -0000
+@@ -91,7 +91,7 @@
+     long m_nLength;         // length of the misspelled word within strContext
+ 
+   public:  
+-    MisspellingContext::MisspellingContext()
++    MisspellingContext()
+     {
+       m_strContext = _T("");
+       m_nOffset = 0;

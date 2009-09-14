@@ -1,0 +1,458 @@
+Index: src/CodeBlocks-unix.cbp
+===================================================================
+--- src/CodeBlocks-unix.cbp	(revision 5783)
++++ src/CodeBlocks-unix.cbp	(working copy)
+@@ -448,6 +448,9 @@
+ 		<Unit filename="include/cbproject.h">
+ 			<Option target="sdk" />
+ 		</Unit>
++		<Unit filename="include/cbstatusbar.h">
++			<Option target="sdk" />
++		</Unit>
+ 		<Unit filename="include/cbstyledtextctrl.h">
+ 			<Option target="sdk" />
+ 		</Unit>
+@@ -1946,6 +1949,9 @@
+ 		<Unit filename="sdk/cbproject.cpp">
+ 			<Option target="sdk" />
+ 		</Unit>
++		<Unit filename="sdk/cbstatusbar.cpp">
++			<Option target="sdk" />
++		</Unit>
+ 		<Unit filename="sdk/cbstyledtextctrl.cpp">
+ 			<Option target="sdk" />
+ 		</Unit>
+Index: src/CodeBlocks.cbp
+===================================================================
+--- src/CodeBlocks.cbp	(revision 5783)
++++ src/CodeBlocks.cbp	(working copy)
+@@ -536,6 +536,9 @@
+ 		<Unit filename="include\cbproject.h">
+ 			<Option target="sdk" />
+ 		</Unit>
++		<Unit filename="include\cbstatusbar.h">
++			<Option target="sdk" />
++		</Unit>
+ 		<Unit filename="include\cbstyledtextctrl.h">
+ 			<Option target="sdk" />
+ 		</Unit>
+@@ -1950,6 +1953,9 @@
+ 		<Unit filename="sdk\cbproject.cpp">
+ 			<Option target="sdk" />
+ 		</Unit>
++		<Unit filename="sdk\cbstatusbar.cpp">
++			<Option target="sdk" />
++		</Unit>
+ 		<Unit filename="sdk\cbstyledtextctrl.cpp">
+ 			<Option target="sdk" />
+ 		</Unit>
+Index: src/include/cbstatusbar.h
+===================================================================
+--- src/include/cbstatusbar.h	(revision 0)
++++ src/include/cbstatusbar.h	(revision 0)
+@@ -0,0 +1,101 @@
++/*
++ * This file is part of the Code::Blocks IDE and licensed under the GNU Lesser General Public License, version 3
++ * http://www.gnu.org/licenses/lgpl-3.0.html
++ */
++
++#ifndef CBSTATUSBAR_H
++#define CBSTATUSBAR_H
++
++#include <vector>
++
++#include "settings.h"
++
++// A custom status bar which contains controls, icons
++
++/** @brief A custom status bar which can contain controls, icons...
++  */
++class DLLIMPORT cbStatusBar : public wxStatusBar
++{
++    // singleton:
++private:
++    friend class MainFrame; // gets initialized from mainframe
++    cbStatusBar(wxWindow *parent); // will be used from friend mainframe
++    cbStatusBar(){};
++    cbStatusBar ( const cbStatusBar& );
++    ~cbStatusBar();
++    static cbStatusBar *single;
++
++public:
++    /** public accessor to get the single instance
++      */
++    static cbStatusBar* GetInstance();
++public:
++    /** Sets the text for one field. Implements the virtual method, but takes an
++        identifier of a field instead of the index of the field.
++        @param text  The text to be set.
++        @param id    The id of the field to set.
++      */
++    virtual void SetStatusText(const wxString& text, int id);
++
++    /** Returns the string associated with a status bar field. Implements the virtual method, but takes an
++        identifier of a field instead of the index of the field.
++        @param  id   The id of the field to set.
++        @return The  status field string if the field id is valid, otherwise the empty string.
++      */
++    virtual wxString GetStatusText(int id = 0) const;
++
++    /** Returns the size and position of a field's internal bounding rectangle.
++        @param  id   The id of the field to set.
++        @param rect  The rectangle values are placed in this variable.
++        @return true if the field id is valid, false otherwise.
++      */
++    virtual bool GetFieldRect(int id, wxRect& rect) const;
++private:
++    void PushStatusText(const wxString& text, int id){};
++    void PopStatusText(int id){};
++
++public:
++    /** Add a new field, which contains a control, to the status bar. The method will return an id,
++        which can thereafter be used to access the field text (through cbStatusBar::SetStatusGeText or
++        cbStatusBar::GetStatusText).
++        @param   ctrl   Pointer to the control to show on the new field.
++        @param   width  Width of the new field. See wxStatusBar::SetStatusWidths for the meaning of this parameter.
++        @return  id of the new field. Use this id to access the fields.
++      **/
++    int AddField(wxWindow *ctrl, int width );
++
++    /** Add a new field to the status bar. The field contains no control.
++        @see cbStatusBar::AddField(wxWindow *ctrl, int width) for details.
++      **/
++    int AddField(int width);
++
++    /** Remove a field from the status bar. This will remove a field from the status bar.
++        If a control is associated wit this filed, RemoveField will destroy it.
++        @param id   The id of the field to remove.
++      **/
++    void RemoveField(int id);
++
++
++private: // event handlers
++    void OnSize(wxSizeEvent& event);
++    void UpdateWidths();
++
++private:
++
++    class cbStatusBarElement{
++        public:
++            int width;
++            wxWindow *control;
++            int id;
++    };
++    typedef std::vector<cbStatusBarElement> ElementVector;
++    ElementVector m_elemetns;
++
++private:
++    int m_idinc;
++    int GetFieldNumberFromId(int id)const;
++
++    DECLARE_EVENT_TABLE()
++};
++
++#endif //CBSTATUSBAR_H
+Index: src/sdk/cbstatusbar.cpp
+===================================================================
+--- src/sdk/cbstatusbar.cpp	(revision 0)
++++ src/sdk/cbstatusbar.cpp	(revision 0)
+@@ -0,0 +1,134 @@
++/*
++ * This file is part of the Code::Blocks IDE and licensed under the GNU Lesser General Public License, version 3
++ * http://www.gnu.org/licenses/lgpl-3.0.html
++ *
++ */
++
++#include "sdk_precomp.h"
++
++#ifndef CB_PRECOMP
++    #include <wx/frame.h> // wxFrame
++    #include <wx/menu.h>
++    #include "cbplugin.h"
++    #include "compiler.h" // GetSwitches
++    #include "sdk_events.h"
++    #include "manager.h"
++    #include "projectbuildtarget.h"
++    #include "cbproject.h"
++    #include "logmanager.h"
++#endif
++
++#include "cbstatusbar.h"
++
++BEGIN_EVENT_TABLE(cbStatusBar, wxStatusBar)
++    EVT_SIZE(cbStatusBar::OnSize)
++//    EVT_TIMER(wxID_ANY, MyStatusBar::OnTimer)
++END_EVENT_TABLE()
++
++
++cbStatusBar::cbStatusBar(wxWindow *parent)
++    : wxStatusBar(parent, wxID_ANY),
++    m_idinc(0)
++{
++    single = this;
++}
++cbStatusBar* cbStatusBar::single = NULL;
++cbStatusBar* cbStatusBar::GetInstance()
++{
++    return single;
++}
++
++cbStatusBar::~cbStatusBar()
++{
++    single = NULL;
++}
++
++
++void cbStatusBar::OnSize(wxSizeEvent& event)
++{
++    for ( unsigned int i = 0 ; i < m_elemetns.size(); i++)
++    {
++        wxWindow *ctrl = m_elemetns[i].control;
++        if ( ctrl )
++        {
++            wxRect rect;
++            GetFieldRect(m_elemetns[i].id, rect);
++            ctrl->SetSize(rect.x + 2, rect.y + 2, rect.width - 4, rect.height - 4);
++        }
++    }
++    event.Skip();
++}
++
++
++int cbStatusBar::AddField(wxWindow *ctrl, int width )
++{
++    cbStatusBarElement elem;
++    elem.control = ctrl;
++    elem.width = width;
++    elem.id =  m_idinc++;
++
++    m_elemetns.push_back(elem);
++
++    UpdateWidths();
++
++    return elem.id;
++}
++int cbStatusBar::AddField(int width)
++{
++    return AddField((wxControl*)NULL, width);
++}
++void cbStatusBar::RemoveField(int FieldID)
++{
++    for ( ElementVector::iterator it = m_elemetns.begin() ; it != m_elemetns.end() ; it++ )
++    {
++        if ( it->id == FieldID )
++        {
++            if ( it->control )
++            {
++                //it->control->Hide();
++                it->control->Destroy();
++            }
++            m_elemetns.erase(it);
++            break;
++        }
++    }
++    UpdateWidths();
++}
++void cbStatusBar::UpdateWidths()
++{
++    int n = m_elemetns.size();
++    int *widths = new int[n];
++    for ( int i = 0 ; i < n ; i++ )
++        widths[i] = m_elemetns[i].width;
++
++    wxStatusBar::SetFieldsCount(n);
++    wxStatusBar::SetStatusWidths(n, widths);
++    delete[] widths;
++}
++int cbStatusBar::GetFieldNumberFromId(int id) const
++{
++    for ( unsigned int i = 0 ; i < m_elemetns.size() ; i++ )
++    {
++        if ( m_elemetns[i].id == id )
++            return i;
++    }
++    // return -1 to indicate that the id does not exist
++    return -1;
++}
++
++// implement the virtual methods to take an id instead of an absolute position:
++void cbStatusBar::SetStatusText(const wxString& text, int id)
++{
++    wxStatusBar::SetStatusText(text, GetFieldNumberFromId(id));
++}
++wxString cbStatusBar::GetStatusText(int id) const
++{
++    return wxStatusBar::GetStatusText(GetFieldNumberFromId(id));
++}
++bool cbStatusBar::GetFieldRect(int id, wxRect& rect) const
++{
++    return wxStatusBar::GetFieldRect(GetFieldNumberFromId(id), rect);
++}
++
++
++
+Index: src/src/main.cpp
+===================================================================
+--- src/src/main.cpp	(revision 5783)
++++ src/src/main.cpp	(working copy)
+@@ -64,6 +64,7 @@
+ #include "infowindow.h"
+ #include "notebookstyles.h"
+ #include "switcherdlg.h"
++#include "cbstatusbar.h"
+ 
+ class wxMyFileDropTarget : public wxFileDropTarget
+ {
+@@ -1648,7 +1649,7 @@
+     int num = 0;
+ 
+     width[num++] = -1; // main field
+-//    width[num++] = 128; // progress bar
++    width[num++] = 128; // progress bar
+     dc.GetTextExtent(_(" WINDOWS-1252 "), &width[num++], &h);
+     dc.GetTextExtent(_(" Line 12345, Column 123 "), &width[num++], &h);
+     dc.GetTextExtent(_(" Overwrite "),  &width[num++], &h);
+@@ -1656,11 +1657,23 @@
+     dc.GetTextExtent(_(" Read/Write....."), &width[num++], &h);
+     dc.GetTextExtent(_(" name_of_profile "), &width[num++], &h);
+ 
+-    CreateStatusBar(num);
+-    SetStatusWidths(num, width);
++    cbStatusBar *sbar = (cbStatusBar *)CreateStatusBar(num);
+ 
+     // here for later usage
+-//    m_pProgressBar = new wxGauge(GetStatusBar(), -1, 100);
++//    m_pProgressBar = new wxGauge(sbar, -1, 100);
++
++
++    num = 0;
++    MainStatusField            = sbar->AddField(width[0]);
++    if ( m_pProgressBar )
++        ProgressStatusField    = sbar->AddField(m_pProgressBar, width[1]);;
++    EncodingStatusField        = sbar->AddField(width[2]);
++    EditorCursorPosStatusField = sbar->AddField(width[3]);
++    EditingModeStatusField     = sbar->AddField(width[4]);
++    EditorFileStateStatusField = sbar->AddField(width[5]);
++    FileEditingModeStatusField = sbar->AddField(width[6]);
++    ProfileStatusField         = sbar->AddField(width[7]);
++
+ #endif // wxUSE_STATUSBAR
+ }
+ 
+@@ -1670,35 +1683,37 @@
+     if (!GetStatusBar())
+         return;
+     cbEditor* ed = Manager::Get()->GetEditorManager()->GetBuiltinActiveEditor();
++    EditorBase *eb = Manager::Get()->GetEditorManager()->GetActiveEditor();
+     wxString personality(Manager::Get()->GetPersonalityManager()->GetPersonality());
+     if (ed)
+     {
+-        int panel = 0;
+         int pos = ed->GetControl()->GetCurrentPos();
+         wxString msg;
+         msg.Printf(_("Line %d, Column %d"), ed->GetControl()->GetCurrentLine() + 1, ed->GetControl()->GetColumn(pos) + 1);
+-        SetStatusText(ed->GetFilename(), panel++);                    //tiwag 050917
+-        SetStatusText(ed->GetEncodingName(), panel++);
+-        SetStatusText(msg, panel++);
+-        SetStatusText(ed->GetControl()->GetOvertype() ? _("Overwrite") : _("Insert"), panel++);
++        SetStatusText(ed->GetFilename(), MainStatusField);
++        SetStatusText(ed->GetEncodingName(), EncodingStatusField);
++        SetStatusText(msg, EditorCursorPosStatusField);
++        SetStatusText(ed->GetControl()->GetOvertype() ? _("Overwrite") : _("Insert"), EditingModeStatusField);
+         #if wxCHECK_VERSION(2, 9, 0)
+-        SetStatusText(ed->GetModified() ? _("Modified") : _T(""), panel++);
++        SetStatusText(ed->GetModified() ? _("Modified") : _T(""), EditorFileStateStatusField);
+         #else
+-        SetStatusText(ed->GetModified() ? _("Modified") : wxEmptyString, panel++);
++        SetStatusText(ed->GetModified() ? _("Modified") : wxEmptyString, EditorFileStateStatusField);
+         #endif
+-        SetStatusText(ed->GetControl()->GetReadOnly() ? _("Read only") : _("Read/Write"), panel++);
+-        SetStatusText(personality, panel++);
++        SetStatusText(ed->GetControl()->GetReadOnly() ? _("Read only") : _("Read/Write"), FileEditingModeStatusField);
++        SetStatusText(personality, ProfileStatusField);
+     }
+     else
+     {
+-        int panel = 0;
+-        SetStatusText(_("Welcome to ") + appglobals::AppName + _T("!"), panel++);
+-        SetStatusText(wxEmptyString, panel++);
+-        SetStatusText(wxEmptyString, panel++);
+-        SetStatusText(wxEmptyString, panel++);
+-        SetStatusText(wxEmptyString, panel++);
+-        SetStatusText(wxEmptyString, panel++);
+-        SetStatusText(personality, panel++);
++        if ( eb )
++            SetStatusText(eb->GetFilename(), MainStatusField);
++        else
++            SetStatusText(_("Welcome to ") + appglobals::AppName + _T("!"), MainStatusField);
++        SetStatusText(wxEmptyString, EncodingStatusField);
++        SetStatusText(wxEmptyString, EditorCursorPosStatusField);
++        SetStatusText(wxEmptyString, EditingModeStatusField);
++        SetStatusText(wxEmptyString, EditorFileStateStatusField);
++        SetStatusText(wxEmptyString, FileEditingModeStatusField);
++        SetStatusText(personality, ProfileStatusField);
+     }
+ #endif // wxUSE_STATUSBAR
+ }
+@@ -2725,13 +2740,6 @@
+ 
+ void MainFrame::OnSize(wxSizeEvent& event)
+ {
+-    if (m_pProgressBar)
+-    {
+-        wxRect r;
+-        GetStatusBar()->GetFieldRect(1, r);
+-        m_pProgressBar->SetPosition(r.GetPosition());
+-        m_pProgressBar->SetSize(r.GetSize());
+-    }
+ 
+     // for flicker-free display
+     event.Skip();
+@@ -4377,3 +4385,11 @@
+     m_StartupDone = true;
+     DoUpdateLayout();
+ }
++
++wxStatusBar *MainFrame::OnCreateStatusBar(int number, long style, wxWindowID id, const wxString& name)
++{
++    cbStatusBar *statusBar = new cbStatusBar(this);
++    statusBar->SetFieldsCount(number);
++
++    return statusBar;
++}
+Index: src/src/main.h
+===================================================================
+--- src/src/main.h	(revision 5783)
++++ src/src/main.h	(working copy)
+@@ -30,6 +30,7 @@
+ class wxAuiNotebook;
+ class InfoPane;
+ class wxGauge;
++class cbStatusBar;
+ 
+ class MainFrame : public wxFrame
+ {
+@@ -290,6 +291,7 @@
+         void AddToRecentFilesHistory(const wxString& filename);
+         void AddToRecentProjectsHistory(const wxString& filename);
+         void TerminateRecentFilesHistory();
++        virtual wxStatusBar *OnCreateStatusBar(int number, long style, wxWindowID id, const wxString& name);
+ 
+         wxFileHistory* m_pFilesHistory;
+         wxFileHistory* m_pProjectsHistory;
+@@ -328,6 +330,15 @@
+         wxDialog* m_pBatchBuildDialog;
+         wxGauge* m_pProgressBar;
+ 
++        int MainStatusField;
++        int ProgressStatusField;
++        int EncodingStatusField;
++        int EditorCursorPosStatusField;
++        int EditingModeStatusField;
++        int EditorFileStateStatusField;
++        int FileEditingModeStatusField;
++        int ProfileStatusField;
++
+         DECLARE_EVENT_TABLE()
+ };
+ 

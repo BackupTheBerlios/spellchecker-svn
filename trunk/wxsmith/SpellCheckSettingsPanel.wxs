@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<wxsmith>
+	<resource_extra>
+		<object root="1" />
+		<object name="ID_CHECKBOX1" class="wxCheckBox" variable="m_checkEnableOnlineSpellChecker" member="yes" />
+		<object name="ID_STATICTEXT3" class="wxStaticText" variable="StaticText3" member="yes" />
+		<object name="ID_CHOICE3" class="wxChoice" variable="m_choiceDictionary" member="yes">
+			<handler function="OnDictionarySelect" entry="EVT_CHOICE" />
+		</object>
+	</resource_extra>
+</wxsmith>
