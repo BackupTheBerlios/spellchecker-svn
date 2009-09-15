@@ -29,7 +29,7 @@
 					<Add option="-DHUNSPELL_STATIC" />
 					<Add directory="$(#cb)/include/wxscintilla/include" />
 					<Add directory="wxspellchecker/include" />
-					<Add directory="hunspell-1.2.8/src/hunspell" />
+					<Add directory="hunspell/src/hunspell" />
 				</Compiler>
 				<Linker>
 					<Add option="`wx-config --libs`" />

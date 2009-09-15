@@ -27,7 +27,7 @@
 					<Add option="-DwxUSE_UNICODE" />
 					<Add option="-DHUNSPELL_STATIC" />
 					<Add directory="wxspellchecker\include" />
-					<Add directory="hunspell-1.2.8\src" />
+					<Add directory="hunspell\src" />
 					<Add directory="$(#wx.include)" />
 					<Add directory="$(#wx.lib)\gcc_dll\mswu" />
 				</Compiler>
@@ -59,8 +59,8 @@
 					<Add directory="wxspellchecker\include" />
 					<Add directory="$(#wx.include)" />
 					<Add directory="$(#wx.lib)\gcc_dll\mswu" />
-					<Add directory="hunspell-1.2.8\src\hunspell" />
-					<Add directory="hunspell-1.2.8\" />
+					<Add directory="hunspell\src\hunspell" />
+					<Add directory="hunspell\" />
 				</Compiler>
 				<Linker>
 					<Add library="wxmsw28u" />
@@ -193,91 +193,91 @@
 			<Option target="default" />
 			<Option target="plugin" />
 		</Unit>
-		<Unit filename="hunspell-1.2.8\src\hunspell\affentry.cxx">
+		<Unit filename="hunspell\src\hunspell\affentry.cxx">
 			<Option target="hunspell" />
 		</Unit>
-		<Unit filename="hunspell-1.2.8\src\hunspell\affentry.hxx">
+		<Unit filename="hunspell\src\hunspell\affentry.hxx">
 			<Option target="hunspell" />
 		</Unit>
-		<Unit filename="hunspell-1.2.8\src\hunspell\affixmgr.cxx">
+		<Unit filename="hunspell\src\hunspell\affixmgr.cxx">
 			<Option target="hunspell" />
 		</Unit>
-		<Unit filename="hunspell-1.2.8\src\hunspell\affixmgr.hxx">
+		<Unit filename="hunspell\src\hunspell\affixmgr.hxx">
 			<Option target="hunspell" />
 		</Unit>
-		<Unit filename="hunspell-1.2.8\src\hunspell\atypes.hxx">
+		<Unit filename="hunspell\src\hunspell\atypes.hxx">
 			<Option target="hunspell" />
 		</Unit>
-		<Unit filename="hunspell-1.2.8\src\hunspell\baseaffix.hxx">
+		<Unit filename="hunspell\src\hunspell\baseaffix.hxx">
 			<Option target="hunspell" />
 		</Unit>
-		<Unit filename="hunspell-1.2.8\src\hunspell\csutil.cxx">
+		<Unit filename="hunspell\src\hunspell\csutil.cxx">
 			<Option target="hunspell" />
 		</Unit>
-		<Unit filename="hunspell-1.2.8\src\hunspell\csutil.hxx">
+		<Unit filename="hunspell\src\hunspell\csutil.hxx">
 			<Option target="hunspell" />
 		</Unit>
-		<Unit filename="hunspell-1.2.8\src\hunspell\dictmgr.cxx">
+		<Unit filename="hunspell\src\hunspell\dictmgr.cxx">
 			<Option target="hunspell" />
 		</Unit>
-		<Unit filename="hunspell-1.2.8\src\hunspell\dictmgr.hxx">
+		<Unit filename="hunspell\src\hunspell\dictmgr.hxx">
 			<Option target="hunspell" />
 		</Unit>
-		<Unit filename="hunspell-1.2.8\src\hunspell\filemgr.cxx">
+		<Unit filename="hunspell\src\hunspell\filemgr.cxx">
 			<Option target="hunspell" />
 		</Unit>
-		<Unit filename="hunspell-1.2.8\src\hunspell\filemgr.hxx">
+		<Unit filename="hunspell\src\hunspell\filemgr.hxx">
 			<Option target="hunspell" />
 		</Unit>
-		<Unit filename="hunspell-1.2.8\src\hunspell\hashmgr.cxx">
+		<Unit filename="hunspell\src\hunspell\hashmgr.cxx">
 			<Option target="hunspell" />
 		</Unit>
-		<Unit filename="hunspell-1.2.8\src\hunspell\hashmgr.hxx">
+		<Unit filename="hunspell\src\hunspell\hashmgr.hxx">
 			<Option target="hunspell" />
 		</Unit>
-		<Unit filename="hunspell-1.2.8\src\hunspell\htypes.hxx">
+		<Unit filename="hunspell\src\hunspell\htypes.hxx">
 			<Option target="hunspell" />
 		</Unit>
-		<Unit filename="hunspell-1.2.8\src\hunspell\hunspell.cxx">
+		<Unit filename="hunspell\src\hunspell\hunspell.cxx">
 			<Option target="hunspell" />
 		</Unit>
-		<Unit filename="hunspell-1.2.8\src\hunspell\hunspell.h">
+		<Unit filename="hunspell\src\hunspell\hunspell.h">
 			<Option target="hunspell" />
 		</Unit>
-		<Unit filename="hunspell-1.2.8\src\hunspell\hunspell.hxx">
+		<Unit filename="hunspell\src\hunspell\hunspell.hxx">
 			<Option target="hunspell" />
 		</Unit>
-		<Unit filename="hunspell-1.2.8\src\hunspell\hunzip.cxx">
+		<Unit filename="hunspell\src\hunspell\hunzip.cxx">
 			<Option target="hunspell" />
 		</Unit>
-		<Unit filename="hunspell-1.2.8\src\hunspell\hunzip.hxx">
+		<Unit filename="hunspell\src\hunspell\hunzip.hxx">
 			<Option target="hunspell" />
 		</Unit>
-		<Unit filename="hunspell-1.2.8\src\hunspell\langnum.hxx">
+		<Unit filename="hunspell\src\hunspell\langnum.hxx">
 			<Option target="hunspell" />
 		</Unit>
-		<Unit filename="hunspell-1.2.8\src\hunspell\phonet.cxx">
+		<Unit filename="hunspell\src\hunspell\phonet.cxx">
 			<Option target="hunspell" />
 		</Unit>
-		<Unit filename="hunspell-1.2.8\src\hunspell\phonet.hxx">
+		<Unit filename="hunspell\src\hunspell\phonet.hxx">
 			<Option target="hunspell" />
 		</Unit>
-		<Unit filename="hunspell-1.2.8\src\hunspell\replist.cxx">
+		<Unit filename="hunspell\src\hunspell\replist.cxx">
 			<Option target="hunspell" />
 		</Unit>
-		<Unit filename="hunspell-1.2.8\src\hunspell\replist.hxx">
+		<Unit filename="hunspell\src\hunspell\replist.hxx">
 			<Option target="hunspell" />
 		</Unit>
-		<Unit filename="hunspell-1.2.8\src\hunspell\suggestmgr.cxx">
+		<Unit filename="hunspell\src\hunspell\suggestmgr.cxx">
 			<Option target="hunspell" />
 		</Unit>
-		<Unit filename="hunspell-1.2.8\src\hunspell\suggestmgr.hxx">
+		<Unit filename="hunspell\src\hunspell\suggestmgr.hxx">
 			<Option target="hunspell" />
 		</Unit>
-		<Unit filename="hunspell-1.2.8\src\hunspell\utf_info.cxx">
+		<Unit filename="hunspell\src\hunspell\utf_info.cxx">
 			<Option target="hunspell" />
 		</Unit>
-		<Unit filename="hunspell-1.2.8\src\hunspell\w_char.hxx">
+		<Unit filename="hunspell\src\hunspell\w_char.hxx">
 			<Option target="hunspell" />
 		</Unit>
 		<Unit filename="manifest.xml">
