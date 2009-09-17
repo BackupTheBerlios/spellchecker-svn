@@ -26,15 +26,16 @@
 
 
 Thesaurus::Thesaurus(wxWindow *dialogsparent):
-    m_pDialogsParent(dialogsparent),
     m_pT(NULL),
+    m_pDialogsParent(dialogsparent),
     m_ok(false)
 {
     //ctor
 }
 Thesaurus::Thesaurus(wxWindow *dialogsparent,const wxString idxpath, const wxString datpath):
+    m_pT(NULL),
     m_pDialogsParent(dialogsparent),
-    m_pT(NULL)
+    m_ok(false)
 {
     //ctor
     SetFiles(idxpath, datpath);

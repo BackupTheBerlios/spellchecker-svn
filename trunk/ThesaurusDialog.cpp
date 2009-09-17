@@ -116,7 +116,7 @@ void ThesaurusDialog::UpdateSynonyme()
     m_ListBoxSynonyme->Clear();
 
     std::vector< wxString > syns = m_syn[meaning];
-    for ( int i = 0 ; i < syns.size() ; i++ )
+    for ( unsigned int i = 0 ; i < syns.size() ; i++ )
         m_ListBoxSynonyme->Append(syns[i]);
     m_ListBoxSynonyme->Select(0);
     UpdateSelectedSynonym();

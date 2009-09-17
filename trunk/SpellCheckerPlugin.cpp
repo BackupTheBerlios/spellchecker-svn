@@ -47,7 +47,7 @@ namespace
     const int idSpellCheck                 = wxNewId();
     const int idThesaurus                  = wxNewId();
 
-    const int MaxSuggestEntries = 5;
+    const unsigned int MaxSuggestEntries = 5;
     const int idSuggest[MaxSuggestEntries] =
         {wxNewId(), wxNewId(), wxNewId(), wxNewId(), wxNewId()};
     const int idMoreSuggestions            = wxNewId();
@@ -118,7 +118,7 @@ void SpellCheckerPlugin::OnAttach()
     // connect events
     Connect(idSpellCheck,      wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(SpellCheckerPlugin::OnSpelling));
     Connect(idSpellCheck,      wxEVT_UPDATE_UI,             wxUpdateUIEventHandler(SpellCheckerPlugin::OnUpdateSpelling));
-    for ( int i = 0 ; i < MaxSuggestEntries ; i++ )
+    for ( unsigned int i = 0 ; i < MaxSuggestEntries ; i++ )
         Connect(idSuggest[i],  wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(SpellCheckerPlugin::OnReplaceBySuggestion), NULL, this);
     Connect(idMoreSuggestions, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(SpellCheckerPlugin::OnMoreSuggestions));
     Connect(idThesaurus,       wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(SpellCheckerPlugin::OnThesaurus));
@@ -191,7 +191,7 @@ void SpellCheckerPlugin::OnRelease(bool appShutDown)
 
     Disconnect(idSpellCheck, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(SpellCheckerPlugin::OnSpelling));
     Disconnect(idSpellCheck, wxEVT_UPDATE_UI,             wxUpdateUIEventHandler(SpellCheckerPlugin::OnUpdateSpelling) );
-    for ( int i = 0 ; i < MaxSuggestEntries ; i++ )
+    for ( unsigned int i = 0 ; i < MaxSuggestEntries ; i++ )
         Disconnect(idSuggest[i], wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(SpellCheckerPlugin::OnReplaceBySuggestion), NULL, this);
     Disconnect(idMoreSuggestions, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(SpellCheckerPlugin::OnMoreSuggestions));
     Disconnect(idThesaurus,  wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(SpellCheckerPlugin::OnThesaurus));
@@ -279,7 +279,7 @@ void SpellCheckerPlugin::BuildModuleMenu(const ModuleType type, wxMenu* menu, co
         if ( m_suggestions.size() )
         {
             wxMenu *SuggestionsMenu = new wxMenu();
-            for ( int i = 0 ; i < MaxSuggestEntries && i < m_suggestions.size() ; i++ )
+            for ( unsigned int i = 0 ; i < MaxSuggestEntries && i < m_suggestions.size() ; i++ )
                 SuggestionsMenu->Append(idSuggest[i], m_suggestions[i] );
             if ( m_suggestions.size() > MaxSuggestEntries )
             {
@@ -396,7 +396,7 @@ void SpellCheckerPlugin::OnReplaceBySuggestion(wxCommandEvent &event)
         cbStyledTextCtrl *stc = ed->GetControl();
         if ( stc )
         {
-            for ( int i = 0 ; i < MaxSuggestEntries ; i++)
+            for ( unsigned int i = 0 ; i < MaxSuggestEntries ; i++)
             {
                 if ( idSuggest[i] == event.GetId() )
                 {

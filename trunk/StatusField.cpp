@@ -89,14 +89,14 @@ void SpellCheckerStatusField::OnRightUp(wxMouseEvent &event)
     m_sccfg->ScanForDictionaries();
     wxMenu *popup = new wxMenu();
     std::vector<wxString> dicts = m_sccfg->GetPossibleDictionaries();
-    for ( int i = 0 ; i < dicts.size()&& i < LANGS ; i++ )
+    for ( unsigned int i = 0 ; i < dicts.size()&& i < LANGS ; i++ )
         popup->Append( idCommand[i], dicts[i], _T(""), wxITEM_CHECK)->Check(dicts[i] == m_sccfg->GetDictionaryName() );
     PopupMenu(popup);
     delete popup;
 }
 void SpellCheckerStatusField::OnSelect(wxCommandEvent &event)
 {
-    int idx;
+    unsigned int idx;
     for ( idx = 0 ; idx < LANGS ; idx++)
         if ( event.GetId() == idCommand[idx])
             break;
