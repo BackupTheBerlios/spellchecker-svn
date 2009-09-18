@@ -33,6 +33,7 @@ class SpellCheckHelper;
 class OnlineSpellChecker;
 class Thesaurus;
 class SpellCheckerConfig;
+class MySpellingDialog;
 class SpellCheckerStatusField;
 
 class SpellCheckerPlugin : public cbPlugin
@@ -155,6 +156,7 @@ class SpellCheckerPlugin : public cbPlugin
     private:
         int m_FunctorId;
         wxSpellCheckEngineInterface* m_pSpellChecker;
+        MySpellingDialog *m_pSpellingDialog;
         SpellCheckHelper *m_pSpellHelper;
         OnlineSpellChecker *m_pOnlineChecker;
         Thesaurus *m_pThesaurus;

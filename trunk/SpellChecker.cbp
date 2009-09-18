@@ -134,10 +134,10 @@
 		<Unit filename="HunspellInterface.h">
 			<Option target="wxSpellChecker" />
 		</Unit>
-		<Unit filename="MySpellCheckDialog.cpp">
+		<Unit filename="MySpellingDialog.cpp">
 			<Option target="plugin" />
 		</Unit>
-		<Unit filename="MySpellCheckDialog.h">
+		<Unit filename="MySpellingDialog.h">
 			<Option target="plugin" />
 		</Unit>
 		<Unit filename="OnlineSpellChecker.cpp">

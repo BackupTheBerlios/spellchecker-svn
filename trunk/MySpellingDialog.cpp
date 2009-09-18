@@ -16,7 +16,7 @@
 * along with SpellChecker. If not, see <http://www.gnu.org/licenses/>.
 *
 */
-#include "MySpellCheckDialog.h"
+#include "MySpellingDialog.h"
 
 //#include "resource.h"
 namespace

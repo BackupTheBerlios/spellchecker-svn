@@ -35,7 +35,7 @@
 
 #include "HunspellInterface.h"
 #include "SpellCheckHelper.h"
-#include "MySpellCheckDialog.h"
+#include "MySpellingDialog.h"
 #include "StatusField.h"
 
 // Register the plugin with Code::Blocks.
@@ -61,6 +61,7 @@ END_EVENT_TABLE()
 
 SpellCheckerPlugin::SpellCheckerPlugin():
     m_pSpellChecker(NULL),
+    m_pSpellingDialog(NULL),
     m_pSpellHelper(NULL),
     m_pOnlineChecker(NULL),
     m_pThesaurus(NULL),
@@ -93,7 +94,9 @@ void SpellCheckerPlugin::OnAttach()
     m_sccfg = new SpellCheckerConfig(this);
 
     //initialize spell checker
-    m_pSpellChecker = new HunspellInterface(new MySpellingDialog( Manager::Get()->GetAppFrame() ));
+    if ( !m_pSpellingDialog )
+        m_pSpellingDialog = new MySpellingDialog( Manager::Get()->GetAppFrame() );
+    m_pSpellChecker = new HunspellInterface(m_pSpellingDialog);
     ConfigureHunspellSpellCheckEngine();
     m_pSpellChecker->InitializeSpellCheckEngine();
 
