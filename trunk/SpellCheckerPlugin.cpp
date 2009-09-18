@@ -315,6 +315,7 @@ void SpellCheckerPlugin::OnSpelling(wxCommandEvent &event)
     if ( !ed ) return;
     cbStyledTextCtrl *stc = ed->GetControl();
     if ( !stc ) return;
+    PlaceWindow(m_pSpellingDialog, pdlBest, true);
     stc->ReplaceSelection(m_pSpellChecker->CheckSpelling(stc->GetSelectedText()));
 }
 void SpellCheckerPlugin::OnUpdateSpelling(wxUpdateUIEvent &event)
@@ -427,6 +428,7 @@ void SpellCheckerPlugin::OnMoreSuggestions(wxCommandEvent &event)
         {
             stc->SetAnchor(m_wordstart);
             stc->SetCurrentPos(m_wordend);
+            PlaceWindow(m_pSpellingDialog, pdlBest, true);
             stc->ReplaceSelection(m_pSpellChecker->CheckSpelling(stc->GetSelectedText()));
         }
     }
