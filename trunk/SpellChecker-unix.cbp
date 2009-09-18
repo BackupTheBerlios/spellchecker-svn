@@ -94,7 +94,7 @@
 			</Target>
 		</Build>
 		<VirtualTargets>
-			<Add alias="all" targets="wxSpellChecker;plugin;hunspell;" />
+			<Add alias="All" targets="wxSpellChecker;plugin;" />
 		</VirtualTargets>
 		<Unit filename="HunspellInterface.cpp">
 			<Option target="wxSpellChecker" />
@@ -102,10 +102,10 @@
 		<Unit filename="HunspellInterface.h">
 			<Option target="wxSpellChecker" />
 		</Unit>
-		<Unit filename="MySpellCheckDialog.cpp">
+		<Unit filename="MySpellingDialog.cpp">
 			<Option target="plugin" />
 		</Unit>
-		<Unit filename="MySpellCheckDialog.h">
+		<Unit filename="MySpellingDialog.h">
 			<Option target="plugin" />
 		</Unit>
 		<Unit filename="OnlineSpellChecker.cpp">
@@ -139,6 +139,12 @@
 			<Option target="plugin" />
 		</Unit>
 		<Unit filename="SpellCheckerPlugin.h">
+			<Option target="plugin" />
+		</Unit>
+		<Unit filename="StatusField.cpp">
+			<Option target="plugin" />
+		</Unit>
+		<Unit filename="StatusField.h">
 			<Option target="plugin" />
 		</Unit>
 		<Unit filename="Thesaurus.cpp">

@@ -126,7 +126,7 @@
 			</Target>
 		</Build>
 		<VirtualTargets>
-			<Add alias="all" targets="hunspell;wxSpellChecker;plugin;" />
+			<Add alias="All" targets="hunspell;wxSpellChecker;plugin;" />
 		</VirtualTargets>
 		<Unit filename="HunspellInterface.cpp">
 			<Option target="wxSpellChecker" />
