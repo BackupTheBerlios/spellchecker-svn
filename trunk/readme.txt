@@ -8,6 +8,6 @@ MyThes is used for the thesaurus. The files th_*.idx and th_*.dat are expected i
 
 Dictionaries for hunspell and MyThes can be downloaded from "http://wiki.services.openoffice.org/wiki/Dictionaries" OOo 2.x files. OOo 3.x Extensions (.oxt) are zip'ed archives containing these files.
 
-If the CB_STATUS_BAR is defined and the patch cbStatusBar.patch is applyed to C::B, then the plugin provides a "status-field" to switch between dictionaries. The prject files have a NO_CB_STATUS_BAR define prepared, you have to simply remove the NO_. (seems not to work yet on linux.)
+If the CB_STATUS_BAR is defined and the patch cbStatusBar.patch is applyed to C::B, then the plugin provides a "status-field" to switch between dictionaries. The prject files have a NO_CB_STATUS_BAR define prepared, you have to simply remove the NO_.
 
 Thanks for any comments/hints/test-reports/questions
