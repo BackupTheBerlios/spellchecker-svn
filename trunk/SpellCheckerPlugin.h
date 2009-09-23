@@ -147,6 +147,7 @@ class SpellCheckerPlugin : public cbPlugin
         void OnThesaurus(wxCommandEvent &event);
         void OnReplaceBySuggestion(wxCommandEvent &event);
         void OnMoreSuggestions(wxCommandEvent &event);
+        void OnAddToPersonalDictionarie(wxCommandEvent &event);
 
         void ConfigureHunspellSpellCheckEngine();
         void ConfigureThesaurus();

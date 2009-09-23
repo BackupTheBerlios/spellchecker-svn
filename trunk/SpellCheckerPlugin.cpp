@@ -50,6 +50,7 @@ namespace
     const unsigned int MaxSuggestEntries = 5;
     const int idSuggest[MaxSuggestEntries] =
         {wxNewId(), wxNewId(), wxNewId(), wxNewId(), wxNewId()};
+    const int idAddToDictionary            = wxNewId();
     const int idMoreSuggestions            = wxNewId();
 }
 
@@ -124,6 +125,7 @@ void SpellCheckerPlugin::OnAttach()
     for ( unsigned int i = 0 ; i < MaxSuggestEntries ; i++ )
         Connect(idSuggest[i],  wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(SpellCheckerPlugin::OnReplaceBySuggestion), NULL, this);
     Connect(idMoreSuggestions, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(SpellCheckerPlugin::OnMoreSuggestions));
+    Connect(idAddToDictionary, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(SpellCheckerPlugin::OnAddToPersonalDictionarie), NULL, this);
     Connect(idThesaurus,       wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(SpellCheckerPlugin::OnThesaurus));
     Connect(idThesaurus,       wxEVT_UPDATE_UI,             wxUpdateUIEventHandler(SpellCheckerPlugin::OnUpdateThesaurus));
 
@@ -197,6 +199,7 @@ void SpellCheckerPlugin::OnRelease(bool appShutDown)
     for ( unsigned int i = 0 ; i < MaxSuggestEntries ; i++ )
         Disconnect(idSuggest[i], wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(SpellCheckerPlugin::OnReplaceBySuggestion), NULL, this);
     Disconnect(idMoreSuggestions, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(SpellCheckerPlugin::OnMoreSuggestions));
+    Disconnect(idAddToDictionary, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(SpellCheckerPlugin::OnAddToPersonalDictionarie), NULL, this);
     Disconnect(idThesaurus,  wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(SpellCheckerPlugin::OnThesaurus));
     Disconnect(idThesaurus,  wxEVT_UPDATE_UI,             wxUpdateUIEventHandler(SpellCheckerPlugin::OnUpdateThesaurus));
 
@@ -284,16 +287,16 @@ void SpellCheckerPlugin::BuildModuleMenu(const ModuleType type, wxMenu* menu, co
             wxMenu *SuggestionsMenu = new wxMenu();
             for ( unsigned int i = 0 ; i < MaxSuggestEntries && i < m_suggestions.size() ; i++ )
                 SuggestionsMenu->Append(idSuggest[i], m_suggestions[i] );
+            SuggestionsMenu->AppendSeparator();
             if ( m_suggestions.size() > MaxSuggestEntries )
-            {
-                SuggestionsMenu->AppendSeparator();
                 SuggestionsMenu->Append(idMoreSuggestions, _("more..."));
-            }
+            SuggestionsMenu->Append(idAddToDictionary, _T("Add '") + misspelledWord + _T("' to dictionary"));
             menu->AppendSubMenu(SuggestionsMenu, _("Spelling suggestions for '") + misspelledWord + _T("'") );
         }
         else
         {
-            menu->Append(idMoreSuggestions, _T("No spelling suggestions for '") + misspelledWord + _T("'"))->Enable(false);
+            //menu->Append(idMoreSuggestions, _T("No spelling suggestions for '") + misspelledWord + _T("'"))->Enable(false);
+            menu->Append(idAddToDictionary, _T("Add '") + misspelledWord + _T("' to dictionary"));
         }
     }
 }
@@ -454,5 +457,22 @@ cbConfigurationPanel *SpellCheckerPlugin::GetConfigurationPanel(wxWindow* parent
     return new SpellCheckSettingsPanel(parent, m_sccfg);
 }
 
-
+void SpellCheckerPlugin::OnAddToPersonalDictionarie(wxCommandEvent &event)
+{
+    if ( m_wordstart == -1 || m_wordend == -1 ) return;
+    cbEditor *ed = Manager::Get()->GetEditorManager()->GetBuiltinActiveEditor();
+    if ( ed )
+    {
+        cbStyledTextCtrl *stc = ed->GetControl();
+        if ( stc )
+        {
+            stc->SetAnchor(m_wordstart);
+            stc->SetCurrentPos(m_wordend);
+            m_pSpellChecker->AddWordToDictionary(stc->GetSelectedText());
+        }
+    }
+    m_wordend = -1;
+    m_wordstart = -1;
+    m_suggestions.Empty();
+}
 
