@@ -327,11 +327,14 @@ void SpellCheckerPlugin::OnUpdateSpelling(wxUpdateUIEvent &event)
     if ( ed )
     {
         cbStyledTextCtrl *stc = ed->GetControl();
-        wxString str = stc->GetSelectedText();
-        if ( !str.IsEmpty() )
+        if ( stc )
         {
-            event.Enable(true);
-            return;
+            wxString str = stc->GetSelectedText();
+            if ( !str.IsEmpty() )
+            {
+                event.Enable(true);
+                return;
+            }
         }
     }
     event.Enable(false);
@@ -381,14 +384,17 @@ void SpellCheckerPlugin::OnThesaurus(wxCommandEvent &event)
 void SpellCheckerPlugin::OnUpdateThesaurus(wxUpdateUIEvent &event)
 {
     cbEditor *ed = Manager::Get()->GetEditorManager()->GetBuiltinActiveEditor();
-    if ( ed && m_pThesaurus->IsOk())
+    if ( ed && m_pThesaurus->IsOk() )
     {
         cbStyledTextCtrl *stc = ed->GetControl();
-        wxString str = stc->GetSelectedText();
-        if ( !str.IsEmpty() )
+        if ( stc )
         {
-            event.Enable(true);
-            return;
+            wxString str = stc->GetSelectedText();
+            if ( !str.IsEmpty() )
+            {
+                event.Enable(true);
+                return;
+            }
         }
     }
     event.Enable(false);
