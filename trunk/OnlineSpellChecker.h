@@ -35,8 +35,6 @@ class EditorPos
 {
     public:
         int linea, lineb;
-        //cbStyledTextCtrl* stc1;
-        //cbStyledTextCtrl* stc2;
         cbEditor *ed;
         EditorPos();
 };
@@ -51,17 +49,17 @@ class OnlineSpellChecker : public EditorHooks::HookFunctorBase
         const int GetIndicator()const;
         void EnableOnlineChecks(bool check = true);
     private:
-        void OnEditorCharAdded(cbEditor* ctrl) const;
+        void OnEditorChanged(cbEditor* ctrl) const;
         void OnEditorUpdateUI(cbEditor *ctrl) const;
 
     private:
         void ClearAllIndications(cbStyledTextCtrl* stc)const;
-        void DoSetIndications(cbEditor* ctrl, cbStyledTextCtrl* stc, EditorPos *old)const;
+        void DoSetIndications(cbEditor* ctrl, cbStyledTextCtrl* stc, EditorPos &old)const;
         void ClearIndicatorLineRange(cbStyledTextCtrl* stc, int linestart, int linestop)const;
 
     private:
 
-        EditorPos *old1, *old2;
+        mutable EditorPos old1, old2;
         wxSpellCheckEngineInterface *m_pSpellChecker;
         SpellCheckHelper *m_pSpellHelper;
         bool m_doChecks;

@@ -23,14 +23,9 @@ OnlineSpellChecker::OnlineSpellChecker(wxSpellCheckEngineInterface *pSpellChecke
     m_pSpellHelper(pSpellHelper),
     m_doChecks(false)
 {
-    old1 = new EditorPos;
-    old2 = new EditorPos;
-    //LoadConfiguration();
 }
 OnlineSpellChecker::~OnlineSpellChecker()
 {
-    delete old1;
-    delete old2;
 }
 
 
@@ -43,23 +38,23 @@ void OnlineSpellChecker::Call(cbEditor* ctrl, wxScintillaEvent &event) const
     if ( event.GetEventType() == wxEVT_SCI_UPDATEUI )
         OnEditorUpdateUI(ctrl);
     else if ( event.GetEventType() == wxEVT_SCI_CHARADDED )
-        OnEditorCharAdded(ctrl);
+        OnEditorChanged(ctrl);
     else if ( event.GetEventType() == wxEVT_SCI_CHANGE  )
-        OnEditorCharAdded(ctrl);
+        OnEditorChanged(ctrl);
 }
 
-void OnlineSpellChecker::OnEditorCharAdded(cbEditor* ctrl) const
+void OnlineSpellChecker::OnEditorChanged(cbEditor* ctrl) const
 {
-    // to refresh at next UpdateUI;
+    // clear internal states to force a refresh at next UpdateUI;
     if ( ctrl->GetControl() == ctrl->GetLeftSplitViewControl() )
     {
-        old1->linea = -1;
-        old1->lineb = -1;
+        old1.linea = -1;
+        old1.lineb = -1;
     }
     if ( ctrl->GetControl() == ctrl->GetRightSplitViewControl() )
     {
-        old2->linea = -1;
-        old2->lineb = -1;
+        old2.linea = -1;
+        old2.lineb = -1;
     }
 }
 
@@ -75,7 +70,7 @@ void OnlineSpellChecker::OnEditorUpdateUI(cbEditor* ctrl) const
     DoSetIndications(ctrl, ctrl->GetRightSplitViewControl(), old2);
 }
 
-void OnlineSpellChecker::DoSetIndications(cbEditor* ctrl, cbStyledTextCtrl* stc, EditorPos *old)const
+void OnlineSpellChecker::DoSetIndications(cbEditor* ctrl, cbStyledTextCtrl* stc, EditorPos &old)const
 {
     if ( stc )
     {
@@ -83,11 +78,11 @@ void OnlineSpellChecker::DoSetIndications(cbEditor* ctrl, cbStyledTextCtrl* stc,
         int lineb = stc->DocLineFromVisible(stc->GetFirstVisibleLine() + stc->LinesOnScreen());
 
         // whatever the current state is, we've already done it once
-        if ( old->linea == linea && old->lineb == lineb && old->ed == ctrl )
+        if ( old.linea == linea && old.lineb == lineb && old.ed == ctrl )
             return;
-        old->linea = linea;
-        old->lineb = lineb;
-        old->ed = ctrl;
+        old.linea = linea;
+        old.lineb = lineb;
+        old.ed = ctrl;
 
         stc->SetIndicatorCurrent(GetIndicator());
         // Set Styling:
@@ -131,10 +126,10 @@ void OnlineSpellChecker::EnableOnlineChecks(bool check)
 {
     m_doChecks = check;
 
-    old1->linea = -1;
-    old1->lineb = -1;
-    old2->linea = -1;
-    old2->lineb = -1;
+    old1.linea = -1;
+    old1.lineb = -1;
+    old2.linea = -1;
+    old2.lineb = -1;
 
     EditorManager *edm = Manager::Get()->GetEditorManager();
     for ( int i = 0 ; i < edm->GetEditorsCount() ; ++i)
