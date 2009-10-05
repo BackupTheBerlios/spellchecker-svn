@@ -1,7 +1,7 @@
-Index: src/CodeBlocks-unix.cbp
+Index: CodeBlocks-unix.cbp
 ===================================================================
---- src/CodeBlocks-unix.cbp	(revision 5783)
-+++ src/CodeBlocks-unix.cbp	(working copy)
+--- CodeBlocks-unix.cbp	(revision 5837)
++++ CodeBlocks-unix.cbp	(working copy)
 @@ -448,6 +448,9 @@
  		<Unit filename="include/cbproject.h">
  			<Option target="sdk" />
@@ -12,7 +12,7 @@ Index: src/CodeBlocks-unix.cbp
  		<Unit filename="include/cbstyledtextctrl.h">
  			<Option target="sdk" />
  		</Unit>
-@@ -1946,6 +1949,9 @@
+@@ -1842,6 +1845,9 @@
  		<Unit filename="sdk/cbproject.cpp">
  			<Option target="sdk" />
  		</Unit>
@@ -22,10 +22,10 @@ Index: src/CodeBlocks-unix.cbp
  		<Unit filename="sdk/cbstyledtextctrl.cpp">
  			<Option target="sdk" />
  		</Unit>
-Index: src/CodeBlocks.cbp
+Index: CodeBlocks.cbp
 ===================================================================
---- src/CodeBlocks.cbp	(revision 5783)
-+++ src/CodeBlocks.cbp	(working copy)
+--- CodeBlocks.cbp	(revision 5837)
++++ CodeBlocks.cbp	(working copy)
 @@ -536,6 +536,9 @@
  		<Unit filename="include\cbproject.h">
  			<Option target="sdk" />
@@ -36,7 +36,7 @@ Index: src/CodeBlocks.cbp
  		<Unit filename="include\cbstyledtextctrl.h">
  			<Option target="sdk" />
  		</Unit>
-@@ -1950,6 +1953,9 @@
+@@ -1953,6 +1956,9 @@
  		<Unit filename="sdk\cbproject.cpp">
  			<Option target="sdk" />
  		</Unit>
@@ -46,10 +46,10 @@ Index: src/CodeBlocks.cbp
  		<Unit filename="sdk\cbstyledtextctrl.cpp">
  			<Option target="sdk" />
  		</Unit>
-Index: src/include/cbstatusbar.h
+Index: include/cbstatusbar.h
 ===================================================================
---- src/include/cbstatusbar.h	(revision 0)
-+++ src/include/cbstatusbar.h	(revision 0)
+--- include/cbstatusbar.h	(revision 0)
++++ include/cbstatusbar.h	(revision 0)
 @@ -0,0 +1,101 @@
 +/*
 + * This file is part of the Code::Blocks IDE and licensed under the GNU Lesser General Public License, version 3
@@ -142,7 +142,7 @@ Index: src/include/cbstatusbar.h
 +            int id;
 +    };
 +    typedef std::vector<cbStatusBarElement> ElementVector;
-+    ElementVector m_elemetns;
++    ElementVector m_elements;
 +
 +private:
 +    int m_idinc;
@@ -152,10 +152,10 @@ Index: src/include/cbstatusbar.h
 +};
 +
 +#endif //CBSTATUSBAR_H
-Index: src/sdk/cbstatusbar.cpp
+Index: sdk/cbstatusbar.cpp
 ===================================================================
---- src/sdk/cbstatusbar.cpp	(revision 0)
-+++ src/sdk/cbstatusbar.cpp	(revision 0)
+--- sdk/cbstatusbar.cpp	(revision 0)
++++ sdk/cbstatusbar.cpp	(revision 0)
 @@ -0,0 +1,134 @@
 +/*
 + * This file is part of the Code::Blocks IDE and licensed under the GNU Lesser General Public License, version 3
@@ -205,13 +205,13 @@ Index: src/sdk/cbstatusbar.cpp
 +
 +void cbStatusBar::OnSize(wxSizeEvent& event)
 +{
-+    for ( unsigned int i = 0 ; i < m_elemetns.size(); i++)
++    for ( unsigned int i = 0 ; i < m_elements.size(); i++)
 +    {
-+        wxWindow *ctrl = m_elemetns[i].control;
++        wxWindow *ctrl = m_elements[i].control;
 +        if ( ctrl )
 +        {
 +            wxRect rect;
-+            GetFieldRect(m_elemetns[i].id, rect);
++            GetFieldRect(m_elements[i].id, rect);
 +            ctrl->SetSize(rect.x + 2, rect.y + 2, rect.width - 4, rect.height - 4);
 +        }
 +    }
@@ -226,7 +226,7 @@ Index: src/sdk/cbstatusbar.cpp
 +    elem.width = width;
 +    elem.id =  m_idinc++;
 +
-+    m_elemetns.push_back(elem);
++    m_elements.push_back(elem);
 +
 +    UpdateWidths();
 +
@@ -238,7 +238,7 @@ Index: src/sdk/cbstatusbar.cpp
 +}
 +void cbStatusBar::RemoveField(int FieldID)
 +{
-+    for ( ElementVector::iterator it = m_elemetns.begin() ; it != m_elemetns.end() ; it++ )
++    for ( ElementVector::iterator it = m_elements.begin() ; it != m_elements.end() ; it++ )
 +    {
 +        if ( it->id == FieldID )
 +        {
@@ -247,7 +247,7 @@ Index: src/sdk/cbstatusbar.cpp
 +                //it->control->Hide();
 +                it->control->Destroy();
 +            }
-+            m_elemetns.erase(it);
++            m_elements.erase(it);
 +            break;
 +        }
 +    }
@@ -255,10 +255,10 @@ Index: src/sdk/cbstatusbar.cpp
 +}
 +void cbStatusBar::UpdateWidths()
 +{
-+    int n = m_elemetns.size();
++    int n = m_elements.size();
 +    int *widths = new int[n];
 +    for ( int i = 0 ; i < n ; i++ )
-+        widths[i] = m_elemetns[i].width;
++        widths[i] = m_elements[i].width;
 +
 +    wxStatusBar::SetFieldsCount(n);
 +    wxStatusBar::SetStatusWidths(n, widths);
@@ -266,9 +266,9 @@ Index: src/sdk/cbstatusbar.cpp
 +}
 +int cbStatusBar::GetFieldNumberFromId(int id) const
 +{
-+    for ( unsigned int i = 0 ; i < m_elemetns.size() ; i++ )
++    for ( unsigned int i = 0 ; i < m_elements.size() ; i++ )
 +    {
-+        if ( m_elemetns[i].id == id )
++        if ( m_elements[i].id == id )
 +            return i;
 +    }
 +    // return -1 to indicate that the id does not exist
@@ -291,10 +291,10 @@ Index: src/sdk/cbstatusbar.cpp
 +
 +
 +
-Index: src/src/main.cpp
+Index: src/main.cpp
 ===================================================================
---- src/src/main.cpp	(revision 5783)
-+++ src/src/main.cpp	(working copy)
+--- src/main.cpp	(revision 5837)
++++ src/main.cpp	(working copy)
 @@ -64,6 +64,7 @@
  #include "infowindow.h"
  #include "notebookstyles.h"
@@ -328,7 +328,7 @@ Index: src/src/main.cpp
 +    num = 0;
 +    MainStatusField            = sbar->AddField(width[0]);
 +    if ( m_pProgressBar )
-+        ProgressStatusField    = sbar->AddField(m_pProgressBar, width[1]);;
++        ProgressStatusField    = sbar->AddField(m_pProgressBar, width[1]);
 +    EncodingStatusField        = sbar->AddField(width[2]);
 +    EditorCursorPosStatusField = sbar->AddField(width[3]);
 +    EditingModeStatusField     = sbar->AddField(width[4]);
@@ -394,7 +394,7 @@ Index: src/src/main.cpp
      }
  #endif // wxUSE_STATUSBAR
  }
-@@ -2725,13 +2740,6 @@
+@@ -2736,13 +2751,6 @@
  
  void MainFrame::OnSize(wxSizeEvent& event)
  {
@@ -408,7 +408,7 @@ Index: src/src/main.cpp
  
      // for flicker-free display
      event.Skip();
-@@ -4377,3 +4385,11 @@
+@@ -4388,3 +4396,11 @@
      m_StartupDone = true;
      DoUpdateLayout();
  }
@@ -420,10 +420,10 @@ Index: src/src/main.cpp
 +
 +    return statusBar;
 +}
-Index: src/src/main.h
+Index: src/main.h
 ===================================================================
---- src/src/main.h	(revision 5783)
-+++ src/src/main.h	(working copy)
+--- src/main.h	(revision 5837)
++++ src/main.h	(working copy)
 @@ -30,6 +30,7 @@
  class wxAuiNotebook;
  class InfoPane;
