@@ -31,13 +31,7 @@
 class wxSpellCheckEngineInterface;
 class SpellCheckHelper;
 class cbStyledTextCtrl;
-class EditorPos
-{
-    public:
-        int linea, lineb;
-        cbEditor *ed;
-        EditorPos();
-};
+
 
 class OnlineSpellChecker : public EditorHooks::HookFunctorBase
 {
@@ -47,19 +41,20 @@ class OnlineSpellChecker : public EditorHooks::HookFunctorBase
         virtual void Call(cbEditor*, wxScintillaEvent&) const;
 
         const int GetIndicator()const;
+        const wxColor GetIndicatorColor()const;
         void EnableOnlineChecks(bool check = true);
     private:
-        void OnEditorChanged(cbEditor* ctrl) const;
+        void OnEditorChange(cbEditor* ctrl) const;
         void OnEditorUpdateUI(cbEditor *ctrl) const;
 
     private:
         void ClearAllIndications(cbStyledTextCtrl* stc)const;
-        void DoSetIndications(cbEditor* ctrl, cbStyledTextCtrl* stc, EditorPos &old)const;
-        void ClearIndicatorLineRange(cbStyledTextCtrl* stc, int linestart, int linestop)const;
+        void DoSetIndications(cbEditor* ctrl)const;
 
     private:
 
-        mutable EditorPos old1, old2;
+        mutable bool alreadychecked;
+        mutable cbEditor *oldctrl;
         wxSpellCheckEngineInterface *m_pSpellChecker;
         SpellCheckHelper *m_pSpellHelper;
         bool m_doChecks;

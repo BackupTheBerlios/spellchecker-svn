@@ -7,11 +7,6 @@
 #include "SpellCheckHelper.h"
 //#include <hunspell.hxx>
 
-EditorPos::EditorPos():
-    linea(-1),
-    lineb(-1),
-    ed(NULL)
-{}
 
 
 
@@ -19,6 +14,8 @@ OnlineSpellChecker::OnlineSpellChecker(wxSpellCheckEngineInterface *pSpellChecke
 //OnlineSpellChecker::OnlineSpellChecker():
     //EditorHooks::HookFunctorBase
     HookFunctorBase(),
+    alreadychecked(false),
+    oldctrl(NULL),
     m_pSpellChecker(pSpellChecker),
     m_pSpellHelper(pSpellHelper),
     m_doChecks(false)
@@ -38,24 +35,15 @@ void OnlineSpellChecker::Call(cbEditor* ctrl, wxScintillaEvent &event) const
     if ( event.GetEventType() == wxEVT_SCI_UPDATEUI )
         OnEditorUpdateUI(ctrl);
     else if ( event.GetEventType() == wxEVT_SCI_CHARADDED )
-        OnEditorChanged(ctrl);
+        OnEditorChange(ctrl);
     else if ( event.GetEventType() == wxEVT_SCI_CHANGE  )
-        OnEditorChanged(ctrl);
+        OnEditorChange(ctrl);
 }
 
-void OnlineSpellChecker::OnEditorChanged(cbEditor* ctrl) const
+void OnlineSpellChecker::OnEditorChange(cbEditor* ctrl) const
 {
     // clear internal states to force a refresh at next UpdateUI;
-    if ( ctrl->GetControl() == ctrl->GetLeftSplitViewControl() )
-    {
-        old1.linea = -1;
-        old1.lineb = -1;
-    }
-    if ( ctrl->GetControl() == ctrl->GetRightSplitViewControl() )
-    {
-        old2.linea = -1;
-        old2.lineb = -1;
-    }
+    alreadychecked = false;
 }
 
 const int OnlineSpellChecker::GetIndicator()const
@@ -63,60 +51,65 @@ const int OnlineSpellChecker::GetIndicator()const
     const int theIndicator = 11;
     return theIndicator;
 }
+const wxColor OnlineSpellChecker::GetIndicatorColor()const
+{
+    //wxColour indicatorColour(cfg->ReadColour(_T("/???/colour"), wxColour(255, 0, 0)));
+    return wxColour(255,0,0);
+}
 void OnlineSpellChecker::OnEditorUpdateUI(cbEditor* ctrl) const
 {
     if ( !m_doChecks ) return;
-    DoSetIndications(ctrl, ctrl->GetLeftSplitViewControl(), old1);
-    DoSetIndications(ctrl, ctrl->GetRightSplitViewControl(), old2);
+    DoSetIndications(ctrl);
 }
 
-void OnlineSpellChecker::DoSetIndications(cbEditor* ctrl, cbStyledTextCtrl* stc, EditorPos &old)const
+void OnlineSpellChecker::DoSetIndications(cbEditor* ctrl)const
 {
-    if ( stc )
+    cbStyledTextCtrl *stc = ctrl->GetLeftSplitViewControl();
+    //Returns a pointer to the left (or top) split-view cbStyledTextCtrl. This function always returns a valid pointer.
+    cbStyledTextCtrl *stcr =ctrl->GetRightSplitViewControl();
+
+    // whatever the current state is, we've already done it once
+    if ( alreadychecked && oldctrl == ctrl )
+        return;
+    alreadychecked = true;
+    oldctrl = ctrl;
+
+    // Set Styling:
+    stc->SetIndicatorCurrent(GetIndicator());
+    stc->IndicatorSetStyle(GetIndicator(), wxSCI_INDIC_SQUIGGLE);
+    stc->IndicatorSetForeground(GetIndicator(), GetIndicatorColor() );
+    if ( stcr )
     {
-        int linea = stc->DocLineFromVisible(stc->GetFirstVisibleLine());
-        int lineb = stc->DocLineFromVisible(stc->GetFirstVisibleLine() + stc->LinesOnScreen());
+        stcr->SetIndicatorCurrent(GetIndicator());
+        stcr->IndicatorSetStyle(GetIndicator(), wxSCI_INDIC_SQUIGGLE);
+        stcr->IndicatorSetForeground(GetIndicator(), GetIndicatorColor() );
+    }
 
-        // whatever the current state is, we've already done it once
-        if ( old.linea == linea && old.lineb == lineb && old.ed == ctrl )
-            return;
-        old.linea = linea;
-        old.lineb = lineb;
-        old.ed = ctrl;
+    // clear all style indications set in a previous run:
+    ClearAllIndications(stc);
 
-        stc->SetIndicatorCurrent(GetIndicator());
-        // Set Styling:
-        stc->IndicatorSetStyle(GetIndicator(), wxSCI_INDIC_SQUIGGLE);
-        //wxColour indicatorColour(cfg->ReadColour(_T("/???/colour"), wxColour(255, 0, 0)));
-        wxColour indicatorColour(255,0,0);
-        stc->IndicatorSetForeground(GetIndicator(), indicatorColour );
-
-        // clear all style indications set in a previous run:
-        ClearIndicatorLineRange(stc, linea, lineb);
-
-        int wordstart = stc->PositionFromLine(linea);
-        int wordend = wordstart;
-        for( int pos = wordstart ;  pos < stc->GetLineEndPosition(lineb) ; )
+    int wordstart = 0;
+    int wordend = wordstart;
+    for( int pos = wordstart ;  pos < stc->GetLength() ; )
+    {
+        wxChar ch = stc->GetCharAt(pos);
+        if ( SpellCheckHelper::IsWhiteSpace(ch) )
         {
-            wxChar ch = stc->GetCharAt(pos);
-            if ( SpellCheckHelper::IsWhiteSpace(ch) )
+            wxString lang = Manager::Get()->GetEditorManager()->GetColourSet()->GetLanguageName(ctrl->GetLanguage() );
+            if ( (wordstart != wordend) && m_pSpellHelper->HasStyleToBeChecked(lang, stc->GetStyleAt(pos))  )
             {
-                wxString lang = Manager::Get()->GetEditorManager()->GetColourSet()->GetLanguageName(ctrl->GetLanguage() );
-                if ( (wordstart != wordend) && m_pSpellHelper->HasStyleToBeChecked(lang, stc->GetStyleAt(pos))  )
-                {
-                    wxString word = stc->GetTextRange(wordstart, wordend);
-                    if ( !m_pSpellChecker->IsWordInDictionary(word) )
-                        stc->IndicatorFillRange(wordstart, wordend-wordstart);
-                }
-                pos++;
-                wordstart = pos;
-                wordend = pos;
+                wxString word = stc->GetTextRange(wordstart, wordend);
+                if ( !m_pSpellChecker->IsWordInDictionary(word) )
+                    stc->IndicatorFillRange(wordstart, wordend-wordstart);
             }
-            else
-            {
-                pos++;
-                wordend = pos;
-            }
+            pos++;
+            wordstart = pos;
+            wordend = pos;
+        }
+        else
+        {
+            pos++;
+            wordend = pos;
         }
     }
 }
@@ -126,10 +119,7 @@ void OnlineSpellChecker::EnableOnlineChecks(bool check)
 {
     m_doChecks = check;
 
-    old1.linea = -1;
-    old1.lineb = -1;
-    old2.linea = -1;
-    old2.lineb = -1;
+    alreadychecked = false;
 
     EditorManager *edm = Manager::Get()->GetEditorManager();
     for ( int i = 0 ; i < edm->GetEditorsCount() ; ++i)
@@ -138,15 +128,10 @@ void OnlineSpellChecker::EnableOnlineChecks(bool check)
 
         if ( !ed ) continue;
         if ( check == false )
-        {
-            // clear all style indications set in a previous run
-            ClearAllIndications(ed->GetLeftSplitViewControl());
-            ClearAllIndications(ed->GetRightSplitViewControl());
-        }
+            // clear all indications set in a previous run
+            ClearAllIndications(ed->GetControl());
         else
-        {
             OnEditorUpdateUI(ed);
-        }
     }
 }
 
@@ -157,13 +142,4 @@ void OnlineSpellChecker::ClearAllIndications(cbStyledTextCtrl* stc)const
         stc->SetIndicatorCurrent(GetIndicator());
         stc->IndicatorClearRange(0, stc->GetLength());
     }
-}
-
-void OnlineSpellChecker::ClearIndicatorLineRange(cbStyledTextCtrl* stc, int linestart, int linestop)const
-{
-    int start = stc->PositionFromLine(linestart);
-    int stop = stc->GetLineEndPosition(linestop);
-
-    stc->SetIndicatorCurrent(GetIndicator());
-    stc->IndicatorClearRange(start, stop-start);
 }
