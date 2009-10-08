@@ -26,10 +26,13 @@
 
 
 //(*Headers(SpellCheckSettingsPanel)
+#include <wx/sizer.h>
 #include <wx/stattext.h>
+#include <wx/textctrl.h>
 #include <wx/checkbox.h>
 #include <wx/panel.h>
 #include <wx/choice.h>
+#include <wx/button.h>
 //*)
 
 class SpellCheckerConfig;
@@ -54,8 +57,17 @@ class SpellCheckSettingsPanel: public cbConfigurationPanel
     private:
 
 		//(*Declarations(SpellCheckSettingsPanel)
+		wxTextCtrl* m_TextThPath;
 		wxChoice* m_choiceDictionary;
+		wxStaticText* StaticText2;
+		wxTextCtrl* m_TextDictPath;
+		wxButton* Button1;
+		wxStaticText* StaticText1;
 		wxStaticText* StaticText3;
+		wxButton* Button2;
+		wxButton* Button3;
+		wxTextCtrl* m_TextBitmapPath;
+		wxStaticText* StaticText4;
 		wxCheckBox* m_checkEnableOnlineSpellChecker;
 		//*)
 
@@ -75,8 +87,7 @@ class SpellCheckSettingsPanel: public cbConfigurationPanel
 	private:
 
 		//(*Handlers(SpellCheckSettingsPanel)
-		void OnChoiceLanguageSelected(wxCommandEvent& event);
-		void OnDictionarySelect(wxCommandEvent& event);
+		void OnChooseDirectory(wxCommandEvent& event);
 		//*)
 
 

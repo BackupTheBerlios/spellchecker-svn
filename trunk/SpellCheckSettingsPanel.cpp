@@ -23,6 +23,7 @@
 #include <logmanager.h>
 
 #include <wx/dir.h>
+#include <wx/dirdlg.h>
 
 #include <map>
 #include <vector>
@@ -45,12 +46,28 @@ SpellCheckSettingsPanel::SpellCheckSettingsPanel(wxWindow* parent, SpellCheckerC
 	//(*Initialize(SpellCheckSettingsPanel)
 	wxXmlResource::Get()->LoadObject(this,parent,_T("SpellCheckSettingsPanel"),_T("wxPanel"));
 	m_checkEnableOnlineSpellChecker = (wxCheckBox*)FindWindow(XRCID("ID_CHECKBOX1"));
+	StaticText1 = (wxStaticText*)FindWindow(XRCID("ID_STATICTEXT1"));
+	m_TextDictPath = (wxTextCtrl*)FindWindow(XRCID("ID_TEXTCTRL1"));
+	Button1 = (wxButton*)FindWindow(XRCID("ID_BUTTON_DICTIONARIES"));
+	StaticText2 = (wxStaticText*)FindWindow(XRCID("ID_STATICTEXT2"));
+	m_TextThPath = (wxTextCtrl*)FindWindow(XRCID("ID_TEXTCTRL2"));
+	Button2 = (wxButton*)FindWindow(XRCID("ID_BUTTON_THESAURI"));
+	StaticText4 = (wxStaticText*)FindWindow(XRCID("ID_STATICTEXT4"));
+	m_TextBitmapPath = (wxTextCtrl*)FindWindow(XRCID("ID_TEXTCTRL3"));
+	Button3 = (wxButton*)FindWindow(XRCID("ID_BUTTON_BITMAPS"));
 	StaticText3 = (wxStaticText*)FindWindow(XRCID("ID_STATICTEXT3"));
 	m_choiceDictionary = (wxChoice*)FindWindow(XRCID("ID_CHOICE3"));
 
-	Connect(XRCID("ID_CHOICE3"),wxEVT_COMMAND_CHOICE_SELECTED,(wxObjectEventFunction)&SpellCheckSettingsPanel::OnDictionarySelect);
+	Connect(XRCID("ID_BUTTON_DICTIONARIES"),wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SpellCheckSettingsPanel::OnChooseDirectory);
+	Connect(XRCID("ID_BUTTON_THESAURI"),wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SpellCheckSettingsPanel::OnChooseDirectory);
+	Connect(XRCID("ID_BUTTON_BITMAPS"),wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SpellCheckSettingsPanel::OnChooseDirectory);
 	//*)
     m_checkEnableOnlineSpellChecker->SetValue( m_sccfg->GetEnableOnlineChecker() );
+
+
+    m_TextDictPath->SetValue(m_sccfg->GetDictionaryPath());
+    m_TextThPath->SetValue(m_sccfg->GetThesaurusPath());
+    m_TextBitmapPath->SetValue(m_sccfg->GetBitmapPath());
 
 	InitDictionaryChoice();
 }
@@ -88,6 +105,20 @@ void SpellCheckSettingsPanel::PostConfig()
     {
         m_sccfg->SetDictionaryName( dic );
     }
+
+    wxString path;
+
+    path = m_TextBitmapPath->GetValue();
+    if ( !path.IsEmpty())
+        m_sccfg->SetBitmapPath(path);
+
+    path = m_TextThPath->GetValue();
+    if ( !path.IsEmpty())
+        m_sccfg->SetThesaurusPath(path);
+
+    path = m_TextDictPath->GetValue();
+    if ( !path.IsEmpty())
+        m_sccfg->SetDictionaryPath(path);
 }
 
 void SpellCheckSettingsPanel::OnApply()
@@ -98,11 +129,48 @@ void SpellCheckSettingsPanel::OnApply()
 
 void SpellCheckSettingsPanel::OnCancel()
 {
-    //wxMessageBox(_T("de haut nid"));
+    m_sccfg->Load(); // to restore the previous settings
 }
 
 
-void SpellCheckSettingsPanel::OnDictionarySelect(wxCommandEvent& event)
+void SpellCheckSettingsPanel::OnChooseDirectory(wxCommandEvent& event)
 {
+    wxString message = _T("Choose the directory containing ");
+    wxTextCtrl *textctrl;
 
+    if ( event.GetId() == XRCID("ID_BUTTON_DICTIONARIES") )
+    {
+        message += _T("the dictionaries");
+        textctrl = m_TextDictPath;
+        //defaultDir = m_TextDictPath->GetValue();
+    }
+    else if ( event.GetId() == XRCID("ID_BUTTON_THESAURI") )
+    {
+        message += _T("the thesaurus files");
+        textctrl = m_TextThPath;
+    }
+    else //XRCID("ID_BUTTON_BITMAPS")
+    {
+        message += _T("the bitmaps");
+        textctrl = m_TextBitmapPath;
+    }
+    wxDirDialog dlg(this, message, textctrl->GetValue(), wxDD_DIR_MUST_EXIST);
+    PlaceWindow(&dlg);
+    if ( dlg.ShowModal() == wxID_OK )
+    {
+        textctrl->SetValue( dlg.GetPath() );
+        if ( event.GetId() == XRCID("ID_BUTTON_DICTIONARIES") )
+        {
+            m_sccfg->ScanForDictionaries(dlg.GetPath());
+            std::vector<wxString> dics = m_sccfg->GetPossibleDictionaries();
+            int sel = m_sccfg->GetSelectedDictionaryNumber();
+
+            m_choiceDictionary->Clear();
+            for ( unsigned int i = 0 ; i < dics.size(); i++ )
+                m_choiceDictionary->AppendString(dics[i]);
+
+            if ( sel != -1 )
+                m_choiceDictionary->Select(sel);
+        }
+    }
 }

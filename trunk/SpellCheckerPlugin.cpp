@@ -114,7 +114,7 @@ void SpellCheckerPlugin::OnAttach()
     //
 #ifdef CB_STATUS_BAR
     cbStatusBar *bar = cbStatusBar::GetInstance();
-    m_fld = new SpellCheckerStatusField(bar, m_sccfg, GetDictionaryPath());
+    m_fld = new SpellCheckerStatusField(bar, m_sccfg);
     m_StatusBarFieldID = bar->AddField(m_fld, 60);
 #endif
 
@@ -133,11 +133,11 @@ void SpellCheckerPlugin::OnAttach()
 void SpellCheckerPlugin::ConfigureThesaurus()
 {
     m_pThesaurus->SetFiles(
-        GetDictionaryPath() + wxFILE_SEP_PATH + _T("th_") + m_sccfg->GetDictionaryName() + _T(".idx"),
-        GetDictionaryPath() + wxFILE_SEP_PATH + _T("th_") + m_sccfg->GetDictionaryName() + _T(".dat")
+        m_sccfg->GetThesaurusPath() + wxFILE_SEP_PATH + _T("th_") + m_sccfg->GetDictionaryName() + _T(".idx"),
+        m_sccfg->GetThesaurusPath() + wxFILE_SEP_PATH + _T("th_") + m_sccfg->GetDictionaryName() + _T(".dat")
     );
 }
-wxString SpellCheckerPlugin::GetDictionaryPath()
+wxString SpellCheckerPlugin::GetOnlineCheckerConfigPath()
 {
     return ConfigManager::GetDataFolder() + wxFileName::GetPathSeparator() + _T("SpellChecker") ;
 }
@@ -145,12 +145,12 @@ void SpellCheckerPlugin::ConfigureHunspellSpellCheckEngine()
 {
     SpellCheckEngineOption DictionaryFileOption(
         _T("dict-file"), _T("Dictionary File"),
-        GetDictionaryPath() + wxFILE_SEP_PATH + m_sccfg->GetDictionaryName() + _T(".dic"), SpellCheckEngineOption::FILE
+        m_sccfg->GetDictionaryPath() + wxFILE_SEP_PATH + m_sccfg->GetDictionaryName() + _T(".dic"), SpellCheckEngineOption::FILE
     );
     m_pSpellChecker->AddOptionToMap(DictionaryFileOption);
     SpellCheckEngineOption AffixFileOption(
         _T("affix-file"), _T("Affix File"),
-        GetDictionaryPath() + wxFILE_SEP_PATH + m_sccfg->GetDictionaryName() + _T(".aff"), SpellCheckEngineOption::FILE
+        m_sccfg->GetDictionaryPath() + wxFILE_SEP_PATH + m_sccfg->GetDictionaryName() + _T(".aff"), SpellCheckEngineOption::FILE
     );
     m_pSpellChecker->AddOptionToMap(AffixFileOption);
     m_pSpellChecker->ApplyOptions();

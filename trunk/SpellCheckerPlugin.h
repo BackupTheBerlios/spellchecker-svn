@@ -138,7 +138,7 @@ class SpellCheckerPlugin : public cbPlugin
 
     public:
         void ReloadSettings();
-        static wxString GetDictionaryPath();
+        static wxString GetOnlineCheckerConfigPath();
 
     private:
         void OnSpelling(wxCommandEvent &event);

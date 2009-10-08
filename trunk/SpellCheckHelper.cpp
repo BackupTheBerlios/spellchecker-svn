@@ -41,7 +41,7 @@ bool SpellCheckHelper::IsWhiteSpace(const wxChar &ch)
 void SpellCheckHelper::LoadConfiguration()
 {
     //TiXmlDocument doc("OnlineSpellChecking.xml");
-    wxString fname = SpellCheckerPlugin::GetDictionaryPath() + wxFILE_SEP_PATH + _T("OnlineSpellChecking.xml");
+    wxString fname = SpellCheckerPlugin::GetOnlineCheckerConfigPath() + wxFILE_SEP_PATH + _T("OnlineSpellChecking.xml");
     TiXmlDocument doc( fname.char_str() );
     if(  !doc.LoadFile() )
         Manager::Get()->GetLogManager()->Log( _("SpellCheck Plugin: Error loading Online SpellChecking Configuration file \"") + fname +_T("\"") );

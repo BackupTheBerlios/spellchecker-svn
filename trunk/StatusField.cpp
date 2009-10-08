@@ -16,15 +16,14 @@ namespace
                                    wxNewId(),wxNewId(),wxNewId(),wxNewId(),wxNewId()};
 };
 
-SpellCheckerStatusField::SpellCheckerStatusField(wxWindow* parent, SpellCheckerConfig *sccfg, const wxString &bitmappath)
+SpellCheckerStatusField::SpellCheckerStatusField(wxWindow* parent, SpellCheckerConfig *sccfg)
     :wxPanel(parent, wxID_ANY),
-    m_sccfg(sccfg),
-    m_bitmappath(bitmappath)
+    m_sccfg(sccfg)
 {
     //ctor
     m_text = new wxStaticText(this, wxID_ANY, m_sccfg->GetDictionaryName());
 
-    wxBitmap bm(wxImage( m_bitmappath + wxFILE_SEP_PATH + m_sccfg->GetDictionaryName() + _T(".png"), wxBITMAP_TYPE_PNG ));
+    wxBitmap bm(wxImage( m_sccfg->GetBitmapPath() + wxFILE_SEP_PATH + m_sccfg->GetDictionaryName() + _T(".png"), wxBITMAP_TYPE_PNG ));
     m_bitmap = new wxStaticBitmap(this, wxID_ANY, bm);
 
     if ( bm.IsOk() )
@@ -54,7 +53,7 @@ SpellCheckerStatusField::~SpellCheckerStatusField()
 void SpellCheckerStatusField::Update()
 {
     m_text->SetLabel(m_sccfg->GetDictionaryName() );
-    wxBitmap bm(wxImage( m_bitmappath + wxFILE_SEP_PATH + m_sccfg->GetDictionaryName()  + _T(".png"), wxBITMAP_TYPE_PNG ));
+    wxBitmap bm(wxImage( m_sccfg->GetBitmapPath() + wxFILE_SEP_PATH + m_sccfg->GetDictionaryName()  + _T(".png"), wxBITMAP_TYPE_PNG ));
     if ( bm.IsOk() )
     {
         m_text->Hide();

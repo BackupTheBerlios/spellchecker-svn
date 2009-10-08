@@ -22,7 +22,10 @@
 #include "configmanager.h"
 
 #define CFG_SPELLCHECK_ENABLE_ONLINE_CHECK _T("/SpellChecker/EnableOnlineChecker")
-#define CFG_SPELLCHECK_DICTIONARY_NAME _T("/SpellChecker/Dictionary")
+#define CFG_SPELLCHECK_DICTIONARY_NAME     _T("/SpellChecker/Dictionary")
+#define CFG_SPELLCHECK_DICTIONARY_PATH     _T("/SpellChecker/DictPath")
+#define CFG_SPELLCHECK_THESAURI_PATH       _T("/SpellChecker/ThesPath")
+#define CFG_SPELLCHECK_BITMAPS_PATH        _T("/SpellChecker/BitmPath")
 
 SpellCheckerConfig::SpellCheckerConfig(SpellCheckerPlugin *plugin)
     ://m_DictionaryPath(plugin->GetDic),
@@ -36,12 +39,6 @@ SpellCheckerConfig::SpellCheckerConfig(SpellCheckerPlugin *plugin)
 SpellCheckerConfig::~SpellCheckerConfig()
 {
     //dtor
-}
-
-void SpellCheckerConfig::Reset()
-{
-    m_EnableOnlineChecker = true;
-    m_strDictionaryName   = _T("de_CH");
 }
 
 bool SpellCheckerConfig::GetEnableOnlineChecker()
@@ -64,8 +61,11 @@ int SpellCheckerConfig::GetSelectedDictionaryNumber()const
 {
     return selectedDictionary;
 }
-
 void SpellCheckerConfig::ScanForDictionaries()
+{
+    ScanForDictionaries(GetDictionaryPath());
+}
+void SpellCheckerConfig::ScanForDictionaries(const wxString &path)
 {
     m_dictionaries.clear();
     selectedDictionary = -1;
@@ -73,14 +73,14 @@ void SpellCheckerConfig::ScanForDictionaries()
     wxString filespec(_T("*.dic"));
 
     wxDir dir;
-    if ( dir.Open(m_pPlugin->GetDictionaryPath()) )
+    if ( dir.Open(path) )
     {
         wxString strfilename;
         bool cont = dir.GetFirst(&strfilename, filespec, wxDIR_FILES );
         while ( cont )
         {
             wxFileName fname(strfilename);
-            wxString afffilename = m_pPlugin->GetDictionaryPath() + wxFileName::GetPathSeparator() + fname.GetName() + _T(".aff");
+            wxString afffilename = path + wxFileName::GetPathSeparator() + fname.GetName() + _T(".aff");
             if ( wxFileName::FileExists(afffilename) )
             {
                 if ( fname.GetName() == m_strDictionaryName )
@@ -97,15 +97,27 @@ const std::vector<wxString> &SpellCheckerConfig::GetPossibleDictionaries()const
     return m_dictionaries;
 }
 
-
+const wxString SpellCheckerConfig::GetDictionaryPath()const{return m_DictPath;}
+const wxString SpellCheckerConfig::GetThesaurusPath()const{return m_ThesPath;}
+const wxString SpellCheckerConfig::GetBitmapPath()const{return m_BitmPath;}
+void SpellCheckerConfig::SetDictionaryPath(const wxString &path){m_DictPath = path;}
+void SpellCheckerConfig::SetThesaurusPath(const wxString &path){m_ThesPath = path;}
+void SpellCheckerConfig::SetBitmapPath(const wxString &path){m_BitmPath = path;}
 
 void SpellCheckerConfig::Load()
 {
-    Reset();
+    m_EnableOnlineChecker = true;
+    m_strDictionaryName = _T("de_CH");
+    m_DictPath = m_pPlugin->GetOnlineCheckerConfigPath();
+    m_ThesPath = m_pPlugin->GetOnlineCheckerConfigPath();
+    m_BitmPath = m_pPlugin->GetOnlineCheckerConfigPath();
     if (ConfigManager* cfg = Manager::Get()->GetConfigManager(_T("editor")))
     {
         m_EnableOnlineChecker = cfg->ReadBool(CFG_SPELLCHECK_ENABLE_ONLINE_CHECK, true);
         m_strDictionaryName = cfg->Read(CFG_SPELLCHECK_DICTIONARY_NAME, _T("de_CH") );
+        m_DictPath = cfg->Read(CFG_SPELLCHECK_DICTIONARY_PATH, m_pPlugin->GetOnlineCheckerConfigPath());
+        m_ThesPath = cfg->Read(CFG_SPELLCHECK_THESAURI_PATH, m_pPlugin->GetOnlineCheckerConfigPath());
+        m_BitmPath = cfg->Read(CFG_SPELLCHECK_BITMAPS_PATH, m_pPlugin->GetOnlineCheckerConfigPath());
     }
 }
 void SpellCheckerConfig::Save()
@@ -114,6 +126,9 @@ void SpellCheckerConfig::Save()
     {
         cfg->Write(CFG_SPELLCHECK_ENABLE_ONLINE_CHECK, m_EnableOnlineChecker);
         cfg->Write(CFG_SPELLCHECK_DICTIONARY_NAME, m_strDictionaryName);
+        cfg->Write(CFG_SPELLCHECK_DICTIONARY_PATH, m_DictPath);
+        cfg->Write(CFG_SPELLCHECK_THESAURI_PATH, m_ThesPath);
+        cfg->Write(CFG_SPELLCHECK_BITMAPS_PATH, m_BitmPath);
     }
     m_pPlugin->ReloadSettings();
 }

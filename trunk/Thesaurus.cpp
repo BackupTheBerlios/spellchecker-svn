@@ -63,7 +63,7 @@ void Thesaurus::SetFiles(wxString idxpath, const wxString datpath)
         m_ok = true;
     }
     else
-        Manager::Get()->GetLogManager()->Log(_T("Thesaurus files") + idxpath + _T(" not found!"));
+        Manager::Get()->GetLogManager()->Log(_T("SpellChecker: Thesaurus files '") + idxpath + _T("' not found!"));
 }
 
 

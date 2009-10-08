@@ -11,7 +11,7 @@ class SpellCheckerConfig;
 class SpellCheckerStatusField : public wxPanel
 {
     public:
-        SpellCheckerStatusField(wxWindow* parent, SpellCheckerConfig *sccfg, const wxString &bitmappath);
+        SpellCheckerStatusField(wxWindow* parent, SpellCheckerConfig *sccfg);
         virtual ~SpellCheckerStatusField();
 
         //void SetLanguage(const wxString &lang);
@@ -20,7 +20,6 @@ class SpellCheckerStatusField : public wxPanel
         wxStaticBitmap *m_bitmap;
         wxStaticText   *m_text;
         SpellCheckerConfig *m_sccfg;
-        wxString m_bitmappath;
 
     private:
         void OnSize(wxSizeEvent &event);
