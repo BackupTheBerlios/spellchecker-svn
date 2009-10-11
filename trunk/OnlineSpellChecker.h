@@ -49,6 +49,7 @@ class OnlineSpellChecker : public EditorHooks::HookFunctorBase
 
     private:
         void ClearAllIndications(cbStyledTextCtrl* stc)const;
+        void ClearAllIndications()const;
         void DoSetIndications(cbEditor* ctrl)const;
 
     private:

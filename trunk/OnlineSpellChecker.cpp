@@ -23,6 +23,7 @@ OnlineSpellChecker::OnlineSpellChecker(wxSpellCheckEngineInterface *pSpellChecke
 }
 OnlineSpellChecker::~OnlineSpellChecker()
 {
+    ClearAllIndications();
 }
 
 
@@ -141,5 +142,16 @@ void OnlineSpellChecker::ClearAllIndications(cbStyledTextCtrl* stc)const
     {
         stc->SetIndicatorCurrent(GetIndicator());
         stc->IndicatorClearRange(0, stc->GetLength());
+    }
+}
+
+void OnlineSpellChecker::ClearAllIndications()const
+{
+    EditorManager *edm = Manager::Get()->GetEditorManager();
+    for ( int i = 0 ; i < edm->GetEditorsCount() ; ++i)
+    {
+        cbEditor *ed = edm->GetBuiltinEditor( i );
+        if ( ed )
+            ClearAllIndications(ed->GetControl());
     }
 }
