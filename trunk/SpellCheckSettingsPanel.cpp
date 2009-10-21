@@ -46,6 +46,8 @@ SpellCheckSettingsPanel::SpellCheckSettingsPanel(wxWindow* parent, SpellCheckerC
 	//(*Initialize(SpellCheckSettingsPanel)
 	wxXmlResource::Get()->LoadObject(this,parent,_T("SpellCheckSettingsPanel"),_T("wxPanel"));
 	m_checkEnableOnlineSpellChecker = (wxCheckBox*)FindWindow(XRCID("ID_CHECKBOX1"));
+	StaticText3 = (wxStaticText*)FindWindow(XRCID("ID_STATICTEXT3"));
+	m_choiceDictionary = (wxChoice*)FindWindow(XRCID("ID_CHOICE3"));
 	StaticText1 = (wxStaticText*)FindWindow(XRCID("ID_STATICTEXT1"));
 	m_TextDictPath = (wxTextCtrl*)FindWindow(XRCID("ID_TEXTCTRL1"));
 	Button1 = (wxButton*)FindWindow(XRCID("ID_BUTTON_DICTIONARIES"));
@@ -55,8 +57,6 @@ SpellCheckSettingsPanel::SpellCheckSettingsPanel(wxWindow* parent, SpellCheckerC
 	StaticText4 = (wxStaticText*)FindWindow(XRCID("ID_STATICTEXT4"));
 	m_TextBitmapPath = (wxTextCtrl*)FindWindow(XRCID("ID_TEXTCTRL3"));
 	Button3 = (wxButton*)FindWindow(XRCID("ID_BUTTON_BITMAPS"));
-	StaticText3 = (wxStaticText*)FindWindow(XRCID("ID_STATICTEXT3"));
-	m_choiceDictionary = (wxChoice*)FindWindow(XRCID("ID_CHOICE3"));
 
 	Connect(XRCID("ID_BUTTON_DICTIONARIES"),wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SpellCheckSettingsPanel::OnChooseDirectory);
 	Connect(XRCID("ID_BUTTON_THESAURI"),wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SpellCheckSettingsPanel::OnChooseDirectory);
@@ -70,6 +70,24 @@ SpellCheckSettingsPanel::SpellCheckSettingsPanel(wxWindow* parent, SpellCheckerC
     m_TextBitmapPath->SetValue(m_sccfg->GetBitmapPath());
 
 	InitDictionaryChoice();
+
+    m_TextDictPath->SetToolTip(_T("Path to dictionary (.aff and .dic) files"));
+    m_TextThPath->SetToolTip(_T("Path to thesaurus (th_*.dat and th_*.idx) files"));
+	m_TextBitmapPath->SetToolTip(_T("Path to dictionary-switcher bitmaps (.png)"));
+
+    Button1->SetToolTip(_T("Select path to dictionary (.aff and .dic) files"));
+    Button2->SetToolTip(_T("Select path to thesaurus (th_*.dat and th_*.idx) files"));
+	Button3->SetToolTip(_T("Select path to dictionary-switcher bitmaps (.png)"));
+
+
+    #ifndef CB_STATUS_BAR
+        // hide since they are not used atm
+        StaticText4->Hide();
+        m_TextBitmapPath->Hide();
+        Button3->Hide();
+    #endif
+
+
 }
 
 SpellCheckSettingsPanel::~SpellCheckSettingsPanel()

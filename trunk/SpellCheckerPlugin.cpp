@@ -371,6 +371,9 @@ void SpellCheckerPlugin::OnThesaurus(wxCommandEvent &event)
     {
         if ( !Synonym.IsEmpty() )
         {
+            ////scintilla version 2:
+            //stc->SetSelectionVoid(selstart, selend);
+            //scintilla version < 2:
             stc->SetSelection(selstart, selend);
             stc->ReplaceSelection(Synonym);
         }

@@ -26,7 +26,6 @@
 
 
 //(*Headers(SpellCheckSettingsPanel)
-#include <wx/sizer.h>
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
 #include <wx/checkbox.h>
