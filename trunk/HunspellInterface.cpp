@@ -59,7 +59,7 @@ int HunspellInterface::InitializeSpellCheckEngine()
   wxString strAffixFile = GetAffixFileName();
   wxString strDictionaryFile = GetDictionaryFileName();
 
-  if ((strAffixFile != wxEmptyString) && (strDictionaryFile != wxEmptyString))
+  if ( wxFileName::FileExists(strAffixFile) && wxFileName::FileExists(strDictionaryFile) )
   {
     wxCharBuffer affixFileCharBuffer = ConvertToUnicode(strAffixFile);
     wxCharBuffer dictionaryFileCharBuffer = ConvertToUnicode(strDictionaryFile);
