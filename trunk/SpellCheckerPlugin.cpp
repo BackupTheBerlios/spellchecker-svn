@@ -483,5 +483,8 @@ void SpellCheckerPlugin::OnAddToPersonalDictionarie(wxCommandEvent &event)
     m_wordend = -1;
     m_wordstart = -1;
     m_suggestions.Empty();
+
+    m_pOnlineChecker->OnEditorChange(ed);
+    m_pOnlineChecker->DoSetIndications(ed);
 }
 

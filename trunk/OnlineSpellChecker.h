@@ -48,6 +48,7 @@ class OnlineSpellChecker : public EditorHooks::HookFunctorBase
         void OnEditorUpdateUI(cbEditor *ctrl) const;
 
     private:
+        friend class SpellCheckerPlugin;
         void ClearAllIndications(cbStyledTextCtrl* stc)const;
         void ClearAllIndications()const;
         void DoSetIndications(cbEditor* ctrl)const;

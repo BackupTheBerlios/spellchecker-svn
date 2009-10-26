@@ -62,7 +62,6 @@ SpellCheckSettingsPanel::SpellCheckSettingsPanel(wxWindow* parent, SpellCheckerC
 	Connect(XRCID("ID_BUTTON_THESAURI"),wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SpellCheckSettingsPanel::OnChooseDirectory);
 	Connect(XRCID("ID_BUTTON_BITMAPS"),wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SpellCheckSettingsPanel::OnChooseDirectory);
 	//*)
-    m_checkEnableOnlineSpellChecker->SetValue( m_sccfg->GetEnableOnlineChecker() );
 
 
     m_TextDictPath->SetValue(m_sccfg->GetDictionaryPath());
@@ -110,6 +109,8 @@ void SpellCheckSettingsPanel::InitDictionaryChoice()
     if ( sel != -1 )
         m_choiceDictionary->Select(sel);
 
+    m_checkEnableOnlineSpellChecker->SetValue( m_sccfg->GetEnableOnlineChecker() );
+    m_checkEnableOnlineSpellChecker->Enable(!dics.empty());
 }
 wxString SpellCheckSettingsPanel::GetTitle() const {return _T("SpellChecker");}
 
@@ -189,6 +190,8 @@ void SpellCheckSettingsPanel::OnChooseDirectory(wxCommandEvent& event)
 
             if ( sel != -1 )
                 m_choiceDictionary->Select(sel);
+
+            m_checkEnableOnlineSpellChecker->Enable(!dics.empty());
         }
     }
 }
