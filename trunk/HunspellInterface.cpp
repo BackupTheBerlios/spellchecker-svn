@@ -198,13 +198,16 @@ wxArrayString HunspellInterface::GetSuggestions(const wxString& strMisspelledWor
     char **wlst;
 
     wxCharBuffer misspelledWordCharBuffer = ConvertToUnicode(strMisspelledWord);
-    int ns = m_pHunspell->suggest(&wlst, misspelledWordCharBuffer);
-    for (int i=0; i < ns; i++)
+    if ( misspelledWordCharBuffer != NULL)
     {
-      wxReturnArray.Add(ConvertFromUnicode(wlst[i]));
-      free(wlst[i]);
+        int ns = m_pHunspell->suggest(&wlst, misspelledWordCharBuffer);
+        for (int i=0; i < ns; i++)
+        {
+          wxReturnArray.Add(ConvertFromUnicode(wlst[i]));
+          free(wlst[i]);
+        }
+        free(wlst);
     }
-    free(wlst);
   }
 
   return wxReturnArray;
@@ -216,6 +219,8 @@ bool HunspellInterface::IsWordInDictionary(const wxString& strWord)
     return false;
 
   wxCharBuffer wordCharBuffer = ConvertToUnicode(strWord);
+  if ( wordCharBuffer == NULL )
+    return false;
   return ((m_pHunspell->spell(wordCharBuffer) == 1) || (m_PersonalDictionary.IsWordInDictionary(strWord)));
 }
 
