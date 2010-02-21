@@ -67,7 +67,9 @@ SpellCheckerPlugin::SpellCheckerPlugin():
     m_pOnlineChecker(NULL),
     m_pThesaurus(NULL),
     m_sccfg(NULL),
+#ifdef CB_STATUS_BAR
     m_fld(NULL)
+#endif
 {
     // Make sure our resources are available.
     // In the generated boilerplate code we have no resources but when
