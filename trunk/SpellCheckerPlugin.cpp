@@ -66,7 +66,8 @@ SpellCheckerPlugin::SpellCheckerPlugin():
     m_pSpellHelper(NULL),
     m_pOnlineChecker(NULL),
     m_pThesaurus(NULL),
-    m_sccfg(NULL)
+    m_sccfg(NULL),
+    m_fld(NULL)
 {
     // Make sure our resources are available.
     // In the generated boilerplate code we have no resources but when
@@ -111,12 +112,6 @@ void SpellCheckerPlugin::OnAttach()
     m_pThesaurus = new Thesaurus(Manager::Get()->GetAppFrame());
     ConfigureThesaurus();
 
-    //
-#ifdef CB_STATUS_BAR
-    cbStatusBar *bar = cbStatusBar::GetInstance();
-    m_fld = new SpellCheckerStatusField(bar, m_sccfg);
-    m_StatusBarFieldID = bar->AddField(m_fld, 60);
-#endif
 
 
     // connect events
@@ -130,6 +125,13 @@ void SpellCheckerPlugin::OnAttach()
     Connect(idThesaurus,       wxEVT_UPDATE_UI,             wxUpdateUIEventHandler(SpellCheckerPlugin::OnUpdateThesaurus));
 
 }
+#ifdef CB_STATUS_BAR
+void SpellCheckerPlugin::CreateStatusField(cbStatusBar *bar)
+{
+    m_fld = new SpellCheckerStatusField(bar, m_sccfg);
+    bar->AddField(this, m_fld, 60);
+}
+#endif
 void SpellCheckerPlugin::ConfigureThesaurus()
 {
     m_pThesaurus->SetFiles(
@@ -184,14 +186,6 @@ void SpellCheckerPlugin::OnRelease(bool appShutDown)
     if ( m_sccfg )
         delete m_sccfg;
     m_sccfg = NULL;
-
-
-#ifdef CB_STATUS_BAR
-    cbStatusBar *bar = cbStatusBar::GetInstance();
-    bar->RemoveField(m_StatusBarFieldID);
-    m_fld = NULL;
-    m_StatusBarFieldID = -1;
-#endif
 
 
     Disconnect(idSpellCheck, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(SpellCheckerPlugin::OnSpelling));
@@ -453,7 +447,8 @@ void SpellCheckerPlugin::ReloadSettings()
     m_pOnlineChecker->EnableOnlineChecks(m_sccfg->GetEnableOnlineChecker());
     ConfigureThesaurus();
 #ifdef CB_STATUS_BAR
-    m_fld->Update();
+    if (m_fld)
+        m_fld->Update();
 #endif
 }
 
@@ -481,7 +476,10 @@ void SpellCheckerPlugin::OnAddToPersonalDictionarie(wxCommandEvent &event)
     m_wordstart = -1;
     m_suggestions.Empty();
 
-    m_pOnlineChecker->OnEditorChange(ed);
-    m_pOnlineChecker->DoSetIndications(ed);
+    if ( ed )
+    {
+        m_pOnlineChecker->OnEditorChange(ed);
+        m_pOnlineChecker->DoSetIndications(ed);
+    }
 }
 

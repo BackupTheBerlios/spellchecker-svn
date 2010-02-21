@@ -89,7 +89,7 @@
 					<Add option="-DCB_PRECOMP" />
 					<Add option="-DWX_PRECOMP" />
 					<Add option="-DwxUSE_UNICODE" />
-					<Add option="-DCB_STATUS_BAR" />
+					<Add option="-DNO_CB_STATUS_BAR" />
 					<Add directory="..\..\..\include" />
 					<Add directory="..\..\..\sdk\wxscintilla\include" />
 					<Add directory="$(#wx.include)" />

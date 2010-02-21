@@ -111,6 +111,10 @@ class SpellCheckerPlugin : public cbPlugin
           */
         virtual bool BuildToolBar(wxToolBar* toolBar);
 
+        #ifdef CB_STATUS_BAR
+        virtual void CreateStatusField(cbStatusBar *bar);
+        #endif
+
     protected:
         /** Any descendent plugin should override this virtual method and
           * perform any necessary initialization. This method is called by
@@ -167,7 +171,6 @@ class SpellCheckerPlugin : public cbPlugin
         int m_wordstart, m_wordend;
 #ifdef CB_STATUS_BAR
     private:
-        int m_StatusBarFieldID;
         SpellCheckerStatusField *m_fld;
 #endif
 
