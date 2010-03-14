@@ -1,6 +1,6 @@
 Index: CodeBlocks.cbp
 ===================================================================
---- CodeBlocks.cbp	(revision 6178)
+--- CodeBlocks.cbp	(revision 6188)
 +++ CodeBlocks.cbp	(working copy)
 @@ -556,6 +556,9 @@
  		<Unit filename="include\cbproject.h">
@@ -53,7 +53,7 @@ Index: CodeBlocks.cbp
  		</Unit>
 Index: include/cbplugin.h
 ===================================================================
---- include/cbplugin.h	(revision 6178)
+--- include/cbplugin.h	(revision 6188)
 +++ include/cbplugin.h	(working copy)
 @@ -51,6 +51,7 @@
  class FileTreeData;
@@ -84,7 +84,7 @@ Index: include/cbstatusbar.h
 ===================================================================
 --- include/cbstatusbar.h	(revision 0)
 +++ include/cbstatusbar.h	(revision 0)
-@@ -0,0 +1,113 @@
+@@ -0,0 +1,108 @@
 +/*
 + * This file is part of the Code::Blocks IDE and licensed under the GNU Lesser General Public License, version 3
 + * http://www.gnu.org/licenses/lgpl-3.0.html
@@ -111,7 +111,6 @@ Index: include/cbstatusbar.h
 +    cbStatusBar(){};
 +    cbStatusBar ( const cbStatusBar& );
 +    ~cbStatusBar();
-+    //static cbStatusBar *single;
 +//private:
 +//    virtual bool GetFieldRect(int i, wxRect& rect) const
 +//    virtual wxString GetStatusText(int i = 0) const
@@ -128,8 +127,7 @@ Index: include/cbstatusbar.h
 +      */
 +    virtual void SetStatusText(const wxString& text, cbPlugin *plugin);
 +
-+    /** Returns the string associated with a status bar field. Implements the virtual method, but takes an
-+        identifier of a field instead of the index of the field.
++    /** Returns the string associated with a status bar field.
 +        @param  plugin  The plugin which wants to get its status text
 +        @return The  status field string if the field id is valid, otherwise the empty string.
 +      */
@@ -154,10 +152,8 @@ Index: include/cbstatusbar.h
 +    std::vector<int> m_mainswidths;
 +
 +public:
-+    /** Add a new field, which contains a control, to the status bar. The method will return an id,
-+        which can thereafter be used to access the field text (through cbStatusBar::SetStatusGeText or
-+        cbStatusBar::GetStatusText).
-+        @param   plugin The plugin which wants to ass a new statusfield
++    /** Add a new field, which contains a control, to the status bar.
++        @param   plugin The plugin which wants to add a new statusfield
 +        @param   ctrl   Pointer to the control to show on the new field.
 +        @param   width  Width of the new field. See wxStatusBar::SetStatusWidths for the meaning of this parameter.
 +      **/
@@ -168,7 +164,7 @@ Index: include/cbstatusbar.h
 +      **/
 +    void AddField(cbPlugin *plugin, int width);
 +
-+    /** Remove a field from the status bar. This will remove a field from the status bar.
++    /** Remove a field from the status bar.
 +        If a control is associated wit this filed, RemoveField will destroy it.
 +        @param id   The plugin which wants to remove its field
 +      **/
@@ -191,7 +187,6 @@ Index: include/cbstatusbar.h
 +    ElementVector m_elements;
 +
 +private:
-+    //int m_idinc;
 +    int GetFieldNumberOfPlugin(cbPlugin *plugin)const;
 +
 +    DECLARE_EVENT_TABLE()
@@ -359,7 +354,7 @@ Index: sdk/cbstatusbar.cpp
 +
 Index: src/main.cpp
 ===================================================================
---- src/main.cpp	(revision 6178)
+--- src/main.cpp	(revision 6188)
 +++ src/main.cpp	(working copy)
 @@ -64,6 +64,9 @@
  #include "infowindow.h"
@@ -483,7 +478,7 @@ Index: src/main.cpp
 +#endif
 Index: src/main.h
 ===================================================================
---- src/main.h	(revision 6178)
+--- src/main.h	(revision 6188)
 +++ src/main.h	(working copy)
 @@ -250,6 +250,7 @@
  
