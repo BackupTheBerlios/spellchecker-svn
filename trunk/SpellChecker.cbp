@@ -181,11 +181,9 @@
 			<Option target="plugin" />
 		</Unit>
 		<Unit filename="ThesaurusDialog.cpp">
-			<Option target="default" />
 			<Option target="plugin" />
 		</Unit>
 		<Unit filename="ThesaurusDialog.h">
-			<Option target="default" />
 			<Option target="plugin" />
 		</Unit>
 		<Unit filename="hunspell\src\hunspell\affentry.cxx">

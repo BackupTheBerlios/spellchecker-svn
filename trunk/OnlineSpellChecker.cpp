@@ -35,10 +35,15 @@ void OnlineSpellChecker::Call(cbEditor* ctrl, wxScintillaEvent &event) const
     // check the event type if it is an update event
     if ( event.GetEventType() == wxEVT_SCI_UPDATEUI )
         OnEditorUpdateUI(ctrl);
-    else if ( event.GetEventType() == wxEVT_SCI_CHARADDED )
-        OnEditorChange(ctrl);
-    else if ( event.GetEventType() == wxEVT_SCI_CHANGE  )
-        OnEditorChange(ctrl);
+    else if ( event.GetEventType() == wxEVT_SCI_MODIFIED) {
+    	if(event.GetModificationType() & wxSCI_MOD_INSERTTEXT) {
+			OnEditorChangeTextRange(ctrl, event.GetPosition(), event.GetPosition() + event.GetLength());
+    	} else if (event.GetModificationType() & wxSCI_MOD_DELETETEXT) {
+    		OnEditorChangeTextRange(ctrl, event.GetPosition(), event.GetPosition());
+    	} else if (event.GetModificationType() & wxSCI_MOD_CHANGESTYLE) {
+    		OnEditorChangeTextRange(ctrl, event.GetPosition(), event.GetPosition() + event.GetLength());
+    	}
+    }
 }
 
 void OnlineSpellChecker::OnEditorChange(cbEditor* ctrl) const
@@ -63,6 +68,51 @@ void OnlineSpellChecker::OnEditorUpdateUI(cbEditor* ctrl) const
     DoSetIndications(ctrl);
 }
 
+void OnlineSpellChecker::OnEditorChangeTextRange(cbEditor* ctrl, int start, int end)const
+{
+    if ( !m_doChecks ) return;
+	if ( alreadychecked && oldctrl == ctrl )
+	{
+		//only recheck the last word to speed things up
+
+		cbStyledTextCtrl *stc = ctrl->GetLeftSplitViewControl();
+
+		//swap and bound check (maybe not needed, but for safety)
+		if (end < start) {
+			int t = start;
+			start = end;
+			end = t;
+		}
+		if (start < 0) start = 0;
+		if (end < 0) end = 0;
+		if (start >= stc->GetLength()) start = stc->GetLength() - 1;
+		if (end > stc->GetLength()) end = stc->GetLength();
+
+		//find recheck range start:
+		if (start > 0) start--;
+		for (; start > 0; ) {
+			wxChar ch = stc->GetCharAt(start - 1);
+			if ( SpellCheckHelper::IsWhiteSpace(ch) )
+				break;
+			start--;
+		}
+		//find recheck range end:
+		for (; end < stc->GetLength() ; ) {
+			wxChar ch = stc->GetCharAt(end);
+			if ( SpellCheckHelper::IsWhiteSpace(ch) )
+				break;
+			end++;
+		}
+
+		if (m_invalidatedRangesStart.GetCount() == 0 || m_invalidatedRangesStart.Last() != start || m_invalidatedRangesEnd.Last() != end) {
+			m_invalidatedRangesStart.Add(start);
+			m_invalidatedRangesEnd.Add(end);
+		}
+	} else {
+		alreadychecked = false;
+	}
+}
+
 void OnlineSpellChecker::DoSetIndications(cbEditor* ctrl)const
 {
     cbStyledTextCtrl *stc = ctrl->GetLeftSplitViewControl();
@@ -71,7 +121,19 @@ void OnlineSpellChecker::DoSetIndications(cbEditor* ctrl)const
 
     // whatever the current state is, we've already done it once
     if ( alreadychecked && oldctrl == ctrl )
-        return;
+    {
+    	if (m_invalidatedRangesStart.GetCount() == 0)
+			return;
+    }
+    else
+    {
+    	//clear:
+    	m_invalidatedRangesStart.Clear();
+    	m_invalidatedRangesEnd.Clear();
+    	//add whole document
+		m_invalidatedRangesStart.Add(0);
+		m_invalidatedRangesEnd.Add(stc->GetLength());
+    }
     alreadychecked = true;
     oldctrl = ctrl;
 
@@ -79,39 +141,121 @@ void OnlineSpellChecker::DoSetIndications(cbEditor* ctrl)const
     stc->SetIndicatorCurrent(GetIndicator());
     stc->IndicatorSetStyle(GetIndicator(), wxSCI_INDIC_SQUIGGLE);
     stc->IndicatorSetForeground(GetIndicator(), GetIndicatorColor() );
+#ifndef wxHAVE_RAW_BITMAP
+    // If wxWidgets is build without rawbitmap-support, the indicators become opaque
+    // and hide the text, so we show them under the text.
+    // Not enabled as default, because the readability is a little bit worse.
+    stc->IndicatorSetUnder(theIndicator,true);
+#endif
     if ( stcr )
     {
         stcr->SetIndicatorCurrent(GetIndicator());
         stcr->IndicatorSetStyle(GetIndicator(), wxSCI_INDIC_SQUIGGLE);
         stcr->IndicatorSetForeground(GetIndicator(), GetIndicatorColor() );
+#ifndef wxHAVE_RAW_BITMAP
+        stcr->IndicatorSetUnder(theIndicator,true);
+#endif
     }
 
-    // clear all style indications set in a previous run:
-    ClearAllIndications(stc);
+	// Manager::Get()->GetLogManager()->Log(wxT("OSC: update regions"));
 
-    int wordstart = 0;
-    int wordend = wordstart;
-    for( int pos = wordstart ;  pos < stc->GetLength() ; )
-    {
-        wxChar ch = stc->GetCharAt(pos);
-        if ( SpellCheckHelper::IsWhiteSpace(ch) )
-        {
-            wxString lang = Manager::Get()->GetEditorManager()->GetColourSet()->GetLanguageName(ctrl->GetLanguage() );
-            if ( (wordstart != wordend) && m_pSpellHelper->HasStyleToBeChecked(lang, stc->GetStyleAt(pos))  )
-            {
-                wxString word = stc->GetTextRange(wordstart, wordend);
-                if ( !m_pSpellChecker->IsWordInDictionary(word) )
-                    stc->IndicatorFillRange(wordstart, wordend-wordstart);
+	for (int i = 0; i < (int)m_invalidatedRangesStart.GetCount(); i++) {
+		int start = m_invalidatedRangesStart[i];
+		int end = m_invalidatedRangesEnd[i];
+		//bound:
+		if (start < 0) start = 0;
+		if (end < 0) end = 0;
+		if (start >= stc->GetLength()) start = stc->GetLength() - 1;
+		if (end > stc->GetLength()) end = stc->GetLength();
+
+		if (start != end) {
+			//remove styling:
+			stc->IndicatorClearRange(start, end - start);
+
+			int wordstart = start;
+			int wordend = wordstart;
+			for( int pos = wordstart ;  pos < end ; )
+			{
+				wxChar ch = stc->GetCharAt(pos);
+				if ( SpellCheckHelper::IsWhiteSpace(ch) )
+				{
+					if (wordstart != wordend) {
+						wxString lang = Manager::Get()->GetEditorManager()->GetColourSet()->GetLanguageName(ctrl->GetLanguage() );
+						if ( m_pSpellHelper->HasStyleToBeChecked(lang, stc->GetStyleAt(wordstart))  )
+						{
+							DissectWordAndCheck(stc, wordstart, wordend);
+						}
+					}
+					pos++;
+					wordstart = pos;
+					wordend = pos;
+				}
+				else
+				{
+					pos++;
+					wordend = pos;
+				}
+			}
+			if (wordstart != wordend) {
+				wxString lang = Manager::Get()->GetEditorManager()->GetColourSet()->GetLanguageName(ctrl->GetLanguage() );
+				if ( m_pSpellHelper->HasStyleToBeChecked(lang, stc->GetStyleAt(wordstart))  )
+				{
+				    DissectWordAndCheck(stc, wordstart, wordend);
+				}
+			}
+		}
+	}
+	m_invalidatedRangesStart.Clear();
+	m_invalidatedRangesEnd.Clear();
+}
+
+void OnlineSpellChecker::DissectWordAndCheck(cbStyledTextCtrl *stc, int wordstart, int wordend)const
+{
+    wxString word = stc->GetTextRange(wordstart, wordend);
+    //Manager::Get()->GetLogManager()->Log(wxT("dissecting: \"") + word + wxT("\""));
+    //and now decide whether the word is an abbreviation and split words when case changes to uppercase
+    bool upper = wxIsupper(word[0]) != 0;
+    int a, b, c;
+    a = 0; b = 0; c = 0;
+    for (; c < word.length();) {
+        wxChar cc = word[c];
+        if (upper == (wxIsupper(cc) != 0)) {
+            //same case
+            c++;
+            b = c;
+        } else {
+            //case changed...
+            if (upper) {
+                if (b - a == 1) {
+                    //start of word
+                    c++;
+                    b = c;
+                } else {
+                    //abbreviation, ignore
+                    a = c;
+                    c++;
+                    b = c;
+                }
+                upper = false;
+            } else {
+                //check the word:
+                //Manager::Get()->GetLogManager()->Log(wxT("checking: \"") + word.Mid(a, b - a) + wxT("\""));
+                if ( !m_pSpellChecker->IsWordInDictionary(word.Mid(a, b - a)) )
+                    stc->IndicatorFillRange(wordstart + a, b - a);
+                //next:
+                a = c;
+                c++;
+                b = c;
+                upper = true;
             }
-            pos++;
-            wordstart = pos;
-            wordend = pos;
         }
-        else
-        {
-            pos++;
-            wordend = pos;
-        }
+    }
+    //check the remaining letters
+    if (upper == false || b - a == 1) {
+        //check the word:
+        //Manager::Get()->GetLogManager()->Log(wxT("checking: \"") + word.Mid(a, b - a) + wxT("\""));
+        if ( !m_pSpellChecker->IsWordInDictionary(word.Mid(a, b - a)) )
+            stc->IndicatorFillRange(wordstart + a, b - a);
     }
 }
 

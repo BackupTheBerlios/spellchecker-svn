@@ -45,6 +45,7 @@ class OnlineSpellChecker : public EditorHooks::HookFunctorBase
         void EnableOnlineChecks(bool check = true);
     private:
         void OnEditorChange(cbEditor* ctrl) const;
+        void OnEditorChangeTextRange(cbEditor* ctrl, int start, int end) const;
         void OnEditorUpdateUI(cbEditor *ctrl) const;
 
     private:
@@ -52,11 +53,13 @@ class OnlineSpellChecker : public EditorHooks::HookFunctorBase
         void ClearAllIndications(cbStyledTextCtrl* stc)const;
         void ClearAllIndications()const;
         void DoSetIndications(cbEditor* ctrl)const;
-
+        void DissectWordAndCheck(cbStyledTextCtrl *stc, int wordstart, int wordend)const;
     private:
 
         mutable bool alreadychecked;
         mutable cbEditor *oldctrl;
+        mutable wxArrayInt m_invalidatedRangesStart;
+        mutable wxArrayInt m_invalidatedRangesEnd;
         wxSpellCheckEngineInterface *m_pSpellChecker;
         SpellCheckHelper *m_pSpellHelper;
         bool m_doChecks;

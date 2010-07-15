@@ -66,9 +66,9 @@ SpellCheckerPlugin::SpellCheckerPlugin():
     m_pSpellHelper(NULL),
     m_pOnlineChecker(NULL),
     m_pThesaurus(NULL),
-    m_sccfg(NULL),
+    m_sccfg(NULL)
 #ifdef CB_STATUS_BAR
-    m_fld(NULL)
+    ,m_fld(NULL)
 #endif
 {
     // Make sure our resources are available.
