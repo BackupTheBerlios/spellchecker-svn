@@ -33,16 +33,17 @@ fi
 
 shopt -s expand_aliases
 
-alias hunspell='../src/tools/hunspell'
-alias analyze='../src/tools/analyze'
+alias hunspell='../libtool --mode=execute -dlopen ../src/hunspell/.libs/libhunspell*.la ../src/tools/hunspell'
+alias analyze='../libtool --mode=execute -dlopen ../src/hunspell/.libs/libhunspell*.la ../src/tools/analyze'
 
 if [ "$VALGRIND" != "" ]; then
   rm -f $TEMPDIR/test.pid*
   if [ ! -d $TEMPDIR/badlogs ]; then
     mkdir $TEMPDIR/badlogs
   fi
-  alias hunspell='valgrind --tool=$VALGRIND --leak-check=yes --show-reachable=yes --log-file=$TEMPDIR/test.pid ../src/tools/.libs/lt-hunspell'
-  alias analyze='valgrind --tool=$VALGRIND --leak-check=yes --show-reachable=yes --log-file=$TEMPDIR/test.pid ../src/tools/.libs/lt-analyze'
+
+  alias hunspell='../libtool --mode=execute -dlopen ../src/hunspell/.libs/libhunspell*.la valgrind --tool=$VALGRIND --leak-check=yes --show-reachable=yes --log-file=$TEMPDIR/test.pid ../src/tools/hunspell'
+  alias analyze='../libtool --mode=execute -dlopen ../src/hunspell/.libs/libhunspell*.la valgrind --tool=$VALGRIND --leak-check=yes --show-reachable=yes --log-file=$TEMPDIR/test.pid ../src/tools/analyze'
 fi
 
 # Tests good words
