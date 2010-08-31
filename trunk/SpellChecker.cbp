@@ -97,6 +97,7 @@
 					<Add directory="wxspellchecker\include" />
 				</Compiler>
 				<Linker>
+					<Add option="-Wl,--enable-auto-import" />
 					<Add library="wxSpellChecker" />
 					<Add library="hunspell-1.2" />
 					<Add library="wxscintilla" />
