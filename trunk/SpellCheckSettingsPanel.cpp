@@ -49,13 +49,13 @@ SpellCheckSettingsPanel::SpellCheckSettingsPanel(wxWindow* parent, SpellCheckerC
 	StaticText3 = (wxStaticText*)FindWindow(XRCID("ID_STATICTEXT3"));
 	m_choiceDictionary = (wxChoice*)FindWindow(XRCID("ID_CHOICE3"));
 	StaticText1 = (wxStaticText*)FindWindow(XRCID("ID_STATICTEXT1"));
-	m_TextDictPath = (wxTextCtrl*)FindWindow(XRCID("ID_TEXTCTRL1"));
-	Button1 = (wxButton*)FindWindow(XRCID("ID_BUTTON_DICTIONARIES"));
 	StaticText2 = (wxStaticText*)FindWindow(XRCID("ID_STATICTEXT2"));
-	m_TextThPath = (wxTextCtrl*)FindWindow(XRCID("ID_TEXTCTRL2"));
-	Button2 = (wxButton*)FindWindow(XRCID("ID_BUTTON_THESAURI"));
 	StaticText4 = (wxStaticText*)FindWindow(XRCID("ID_STATICTEXT4"));
+	m_TextDictPath = (wxTextCtrl*)FindWindow(XRCID("ID_TEXTCTRL1"));
+	m_TextThPath = (wxTextCtrl*)FindWindow(XRCID("ID_TEXTCTRL2"));
 	m_TextBitmapPath = (wxTextCtrl*)FindWindow(XRCID("ID_TEXTCTRL3"));
+	Button1 = (wxButton*)FindWindow(XRCID("ID_BUTTON_DICTIONARIES"));
+	Button2 = (wxButton*)FindWindow(XRCID("ID_BUTTON_THESAURI"));
 	Button3 = (wxButton*)FindWindow(XRCID("ID_BUTTON_BITMAPS"));
 
 	Connect(XRCID("ID_BUTTON_DICTIONARIES"),wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SpellCheckSettingsPanel::OnChooseDirectory);
@@ -63,6 +63,7 @@ SpellCheckSettingsPanel::SpellCheckSettingsPanel(wxWindow* parent, SpellCheckerC
 	Connect(XRCID("ID_BUTTON_BITMAPS"),wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SpellCheckSettingsPanel::OnChooseDirectory);
 	//*)
 
+    Connect(XRCID("ID_TEXTCTRL1"), wxEVT_COMMAND_TEXT_UPDATED, (wxObjectEventFunction)&SpellCheckSettingsPanel::OnChangeDictPathText);
 
     m_TextDictPath->SetValue(m_sccfg->GetDictionaryPath());
     m_TextThPath->SetValue(m_sccfg->GetThesaurusPath());
@@ -192,6 +193,35 @@ void SpellCheckSettingsPanel::OnChooseDirectory(wxCommandEvent& event)
                 m_choiceDictionary->Select(sel);
 
             m_checkEnableOnlineSpellChecker->Enable(!dics.empty());
+            if ( dics.empty() ) m_checkEnableOnlineSpellChecker->SetValue(false);
+
         }
+    }
+}
+
+
+void SpellCheckSettingsPanel::OnChangeDictPathText( wxCommandEvent &event)
+{
+    if ( wxDir::Exists( m_TextDictPath->GetValue() ) )
+    {
+        m_sccfg->ScanForDictionaries(m_TextDictPath->GetValue());
+        std::vector<wxString> dics = m_sccfg->GetPossibleDictionaries();
+        int sel = m_sccfg->GetSelectedDictionaryNumber();
+
+        m_choiceDictionary->Clear();
+        for ( unsigned int i = 0 ; i < dics.size(); i++ )
+            m_choiceDictionary->AppendString(dics[i]);
+
+        if ( sel != -1 )
+            m_choiceDictionary->Select(sel);
+
+        m_checkEnableOnlineSpellChecker->Enable(!dics.empty());
+        if ( dics.empty() ) m_checkEnableOnlineSpellChecker->SetValue(false);
+    }
+    else
+    {
+        m_choiceDictionary->Clear();
+        m_checkEnableOnlineSpellChecker->Enable(false);
+        m_checkEnableOnlineSpellChecker->SetValue(false);
     }
 }

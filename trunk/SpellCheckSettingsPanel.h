@@ -26,6 +26,7 @@
 
 
 //(*Headers(SpellCheckSettingsPanel)
+#include <wx/sizer.h>
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
 #include <wx/checkbox.h>
@@ -88,6 +89,8 @@ class SpellCheckSettingsPanel: public cbConfigurationPanel
 		//(*Handlers(SpellCheckSettingsPanel)
 		void OnChooseDirectory(wxCommandEvent& event);
 		//*)
+
+		void OnChangeDictPathText( wxCommandEvent &event);
 
 
     private:
