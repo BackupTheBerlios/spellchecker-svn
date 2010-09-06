@@ -67,7 +67,6 @@
 					<Add directory="MyThes-1.0" />
 				</Compiler>
 				<Linker>
-					<Add option="-Wl,--enable-auto-import" />
 					<Add option="`wx-config --libs`" />
 					<Add library="wxSpellChecker" />
 					<Add library="hunspell-1.2" />
@@ -78,8 +77,8 @@
 				</Linker>
 				<ExtraCommands>
 					<Add after="zip -j9 ../../../devel/share/codeblocks/SpellChecker.zip manifest.xml SpellCheckSettingsPanel.xrc" />
-					<Add after='mkdir &quot;../../../devel/share/codeblocks/SpellChecker/&quot; &gt; nul &amp;2&gt;1' />
-					<Add after='mkdir &quot;../../../output/share/codeblocks/SpellChecker/&quot; &gt; nul &amp;2&gt;1' />
+					<Add after='mkdir -p &quot;../../../devel/share/codeblocks/SpellChecker&quot;' />
+					<Add after='mkdir -p &quot;../../../output/share/codeblocks/SpellChecker&quot;' />
 					<Add after='cp *.png &quot;../../../devel/share/codeblocks/images/settings/&quot;' />
 					<Add after='cp OnlineSpellChecking.xml  &quot;../../../devel/share/codeblocks/SpellChecker/&quot;' />
 					<Add after='cp dictionaries/*.aff &quot;../../../devel/share/codeblocks/SpellChecker/&quot;' />
