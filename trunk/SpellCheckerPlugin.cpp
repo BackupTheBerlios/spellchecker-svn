@@ -160,8 +160,14 @@ void SpellCheckerPlugin::ConfigureHunspellSpellCheckEngine()
     m_pSpellChecker->ApplyOptions();
 
 
-//    // Set the personal dictionary file
-//   // m_pSpellChecker->OpenPersonalDictionary(_("personaldictionary.dic"));
+    // Set the personal dictionary file
+    HunspellInterface *hsi = dynamic_cast<HunspellInterface *>(m_pSpellChecker);
+    if (hsi) 
+    {
+        wxString dfile = ConfigManager::LocateDataFile(_T("personaldictionary.dic"), sdConfig | sdBase);
+        if (dfile == _T("")) dfile = ConfigManager::GetFolder(sdConfig) + wxFILE_SEP_PATH + _T("personaldictionary.dic");
+        hsi->OpenPersonalDictionary(dfile);
+    }
 }
 
 void SpellCheckerPlugin::OnRelease(bool appShutDown)
@@ -172,6 +178,9 @@ void SpellCheckerPlugin::OnRelease(bool appShutDown)
     // NOTE: after this function, the inherited member variable
     // m_IsAttached will be FALSE...
     EditorHooks::UnregisterHook(m_FunctorId);
+
+    HunspellInterface *hsi = dynamic_cast<HunspellInterface *>(m_pSpellChecker);
+    if (hsi) hsi->GetPersonalDictionary()->SavePersonalDictionary();
 
     m_pSpellChecker->UninitializeSpellCheckEngine();
     delete m_pSpellChecker;

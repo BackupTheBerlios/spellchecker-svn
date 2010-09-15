@@ -28,7 +28,7 @@
 
 
 #include <map>
-#include <vector>
+#include <set>
 
 
 // The spell check helper is used to detect if a word has to get spell-checked
@@ -48,7 +48,7 @@ class SpellCheckHelper
 
     protected:
     private:
-        std::map<wxString, std::vector<long> > m_LanguageIndices;
+        std::map<wxString, std::set<long> > m_LanguageIndices;
 };
 
 #endif // SPELLCHECKHELPER_H

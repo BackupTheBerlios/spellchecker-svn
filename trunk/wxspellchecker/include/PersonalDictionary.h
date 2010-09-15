@@ -26,7 +26,7 @@ public:
   void SetDictionaryFileName(const wxString& filename) { m_strDictionaryFileName = filename; }
 
 private:
-  wxArrayString m_DictionaryWords;
+  wxSortedArrayString m_DictionaryWords;
   wxString m_strDictionaryFileName;
 };
 

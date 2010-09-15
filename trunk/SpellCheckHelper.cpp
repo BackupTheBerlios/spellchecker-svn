@@ -58,14 +58,14 @@ void SpellCheckHelper::LoadConfiguration()
             wxString index = wxString ( LangElement->Attribute("index"), wxConvUTF8 );
             // break-up array
             wxArrayString indices = GetArrayFromString(index, _T(","));
-            std::vector<long> idcs;
+            std::set<long> idcs;
             for (size_t i = 0; i < indices.GetCount(); ++i)
             {
             	if (indices[i].IsEmpty())
                     continue;
                 long value = 0;
                 indices[i].ToLong(&value);
-                idcs.push_back(value);
+                idcs.insert(value);
             }
             if ( idcs.size() > 0)
                 m_LanguageIndices[name] = idcs;
@@ -75,13 +75,10 @@ void SpellCheckHelper::LoadConfiguration()
 
 bool SpellCheckHelper::HasStyleToBeChecked(wxString langname, int style)const
 {
-    std::map<wxString, std::vector<long> >::const_iterator it = m_LanguageIndices.find(langname);
+    std::map<wxString, std::set<long> >::const_iterator it = m_LanguageIndices.find(langname);
     if ( it != m_LanguageIndices.end())
     {
-        std::vector<long> idcs = it->second;
-        for ( size_t i = 0 ; i < idcs.size() ; i++ )
-            if ( idcs[i] == style )
-                return true;
+        return it->second.find(style) != it->second.end();
     }
     return false;
 }
