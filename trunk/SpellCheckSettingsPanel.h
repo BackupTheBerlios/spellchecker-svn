@@ -26,11 +26,11 @@
 
 
 //(*Headers(SpellCheckSettingsPanel)
-#include <wx/sizer.h>
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
 #include <wx/checkbox.h>
 #include <wx/panel.h>
+#include <wx/hyperlink.h>
 #include <wx/choice.h>
 #include <wx/button.h>
 //*)
@@ -64,6 +64,7 @@ class SpellCheckSettingsPanel: public cbConfigurationPanel
 		wxButton* Button1;
 		wxStaticText* StaticText1;
 		wxStaticText* StaticText3;
+		wxHyperlinkCtrl* HyperlinkCtrl1;
 		wxButton* Button2;
 		wxButton* Button3;
 		wxTextCtrl* m_TextBitmapPath;

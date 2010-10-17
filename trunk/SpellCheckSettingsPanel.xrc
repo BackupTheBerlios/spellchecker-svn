@@ -140,6 +140,15 @@
 				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 				<border>5</border>
 			</object>
+			<object class="sizeritem">
+				<object class="wxHyperlinkCtrl" name="ID_HYPERLINKCTRL1">
+					<label>How to configure SpellChecker?</label>
+					<url>http://wiki.codeblocks.org/index.php?title=SpellChecker</url>
+					<tooltip>Get help from http://wiki.codeblocks.org/index.php?title=SpellChecker</tooltip>
+				</object>
+				<flag>wxALL|wxALIGN_LEFT|wxALIGN_TOP</flag>
+				<border>5</border>
+			</object>
 			<object class="spacer">
 				<flag>wxALIGN_LEFT|wxALIGN_TOP</flag>
 				<border>5</border>
