@@ -20,7 +20,6 @@
 #include <configurationpanel.h>
 #include <editor_hooks.h>
 #include <cbstyledtextctrl.h>
-#include <annoyingdialog.h>
 #ifdef CB_STATUS_BAR
     #include <cbstatusbar.h>
 #endif
@@ -37,6 +36,7 @@
 #include "SpellCheckHelper.h"
 #include "MySpellingDialog.h"
 #include "StatusField.h"
+#include "DictionariesNeededDialog.h"
 
 // Register the plugin with Code::Blocks.
 // We are using an anonymous namespace so we don't litter the global one.
@@ -93,6 +93,9 @@ void SpellCheckerPlugin::OnAttach()
     // You should check for it in other functions, because if it
     // is FALSE, it means that the application did *not* "load"
     // (see: does not need) this plugin...
+
+    DictionariesNeededDialog dlg;
+    dlg.ShowModal();
 
     // load configuration
     m_sccfg = new SpellCheckerConfig(this);
@@ -162,7 +165,7 @@ void SpellCheckerPlugin::ConfigureHunspellSpellCheckEngine()
 
     // Set the personal dictionary file
     HunspellInterface *hsi = dynamic_cast<HunspellInterface *>(m_pSpellChecker);
-    if (hsi) 
+    if (hsi)
     {
         wxString dfile = ConfigManager::LocateDataFile(_T("personaldictionary.dic"), sdConfig | sdBase);
         if (dfile == _T("")) dfile = ConfigManager::GetFolder(sdConfig) + wxFILE_SEP_PATH + _T("personaldictionary.dic");

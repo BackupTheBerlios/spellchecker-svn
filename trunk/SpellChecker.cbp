@@ -124,6 +124,12 @@
 		<VirtualTargets>
 			<Add alias="All" targets="hunspell;wxSpellChecker;plugin;" />
 		</VirtualTargets>
+		<Unit filename="DictionariesNeededDialog.cpp">
+			<Option target="plugin" />
+		</Unit>
+		<Unit filename="DictionariesNeededDialog.h">
+			<Option target="plugin" />
+		</Unit>
 		<Unit filename="HunspellInterface.cpp">
 			<Option target="wxSpellChecker" />
 		</Unit>
