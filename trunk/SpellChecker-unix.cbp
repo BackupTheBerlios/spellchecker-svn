@@ -27,7 +27,7 @@
 					<Add option="-DCB_PRECOMP" />
 					<Add option="-DWX_PRECOMP" />
 					<Add option="-DHUNSPELL_STATIC" />
-					<Add directory="../../../include/wxscintilla/include" />
+					<Add directory="../../../sdk/wxscintilla/include" />
 					<Add directory="wxspellchecker/include" />
 					<Add directory="hunspell/src/hunspell" />
 				</Compiler>
@@ -67,6 +67,7 @@
 					<Add directory="MyThes-1.0" />
 				</Compiler>
 				<Linker>
+					<Add option="-Wl,--enable-auto-import" />
 					<Add option="`wx-config --libs`" />
 					<Add library="wxSpellChecker" />
 					<Add library="hunspell-1.2" />
