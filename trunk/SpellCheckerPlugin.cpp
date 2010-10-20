@@ -20,8 +20,8 @@
 #include <configurationpanel.h>
 #include <editor_hooks.h>
 #include <cbstyledtextctrl.h>
-#ifdef CB_STATUS_BAR
-    #include <cbstatusbar.h>
+#ifdef wxUSE_STATUSBAR
+#include <cbstatusbar.h>
 #endif
 
 #include <wx/dir.h>
@@ -67,7 +67,7 @@ SpellCheckerPlugin::SpellCheckerPlugin():
     m_pOnlineChecker(NULL),
     m_pThesaurus(NULL),
     m_sccfg(NULL)
-#ifdef CB_STATUS_BAR
+#ifdef wxUSE_STATUSBAR
     ,m_fld(NULL)
 #endif
 {
@@ -125,12 +125,12 @@ void SpellCheckerPlugin::OnAttach()
     for ( unsigned int i = 0 ; i < MaxSuggestEntries ; i++ )
         Connect(idSuggest[i],  wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(SpellCheckerPlugin::OnReplaceBySuggestion), NULL, this);
     Connect(idMoreSuggestions, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(SpellCheckerPlugin::OnMoreSuggestions));
-    Connect(idAddToDictionary, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(SpellCheckerPlugin::OnAddToPersonalDictionarie), NULL, this);
+    Connect(idAddToDictionary, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(SpellCheckerPlugin::OnAddToPersonalDictionary), NULL, this);
     Connect(idThesaurus,       wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(SpellCheckerPlugin::OnThesaurus));
     Connect(idThesaurus,       wxEVT_UPDATE_UI,             wxUpdateUIEventHandler(SpellCheckerPlugin::OnUpdateThesaurus));
 
 }
-#ifdef CB_STATUS_BAR
+#ifdef wxUSE_STATUSBAR
 void SpellCheckerPlugin::CreateStatusField(cbStatusBar *bar)
 {
     m_fld = new SpellCheckerStatusField(bar, m_sccfg);
@@ -162,13 +162,17 @@ void SpellCheckerPlugin::ConfigureHunspellSpellCheckEngine()
     m_pSpellChecker->AddOptionToMap(AffixFileOption);
     m_pSpellChecker->ApplyOptions();
 
-
+    ConfigurePersonalDictionary();
+}
+void SpellCheckerPlugin::ConfigurePersonalDictionary()
+{
     // Set the personal dictionary file
     HunspellInterface *hsi = dynamic_cast<HunspellInterface *>(m_pSpellChecker);
     if (hsi)
     {
-        wxString dfile = ConfigManager::LocateDataFile(_T("personaldictionary.dic"), sdConfig | sdBase);
-        if (dfile == _T("")) dfile = ConfigManager::GetFolder(sdConfig) + wxFILE_SEP_PATH + _T("personaldictionary.dic");
+        wxString dfile = ConfigManager::LocateDataFile(m_sccfg->GetDictionaryName() + _T("_personaldictionary.dic"), sdConfig );
+        if (dfile == _T(""))
+            dfile = ConfigManager::GetFolder(sdConfig) + wxFILE_SEP_PATH + m_sccfg->GetDictionaryName() + _T("_personaldictionary.dic");
         hsi->OpenPersonalDictionary(dfile);
     }
 }
@@ -182,8 +186,7 @@ void SpellCheckerPlugin::OnRelease(bool appShutDown)
     // m_IsAttached will be FALSE...
     EditorHooks::UnregisterHook(m_FunctorId);
 
-    HunspellInterface *hsi = dynamic_cast<HunspellInterface *>(m_pSpellChecker);
-    if (hsi) hsi->GetPersonalDictionary()->SavePersonalDictionary();
+    SavePersonalDictionary();
 
     m_pSpellChecker->UninitializeSpellCheckEngine();
     delete m_pSpellChecker;
@@ -207,10 +210,15 @@ void SpellCheckerPlugin::OnRelease(bool appShutDown)
     for ( unsigned int i = 0 ; i < MaxSuggestEntries ; i++ )
         Disconnect(idSuggest[i], wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(SpellCheckerPlugin::OnReplaceBySuggestion), NULL, this);
     Disconnect(idMoreSuggestions, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(SpellCheckerPlugin::OnMoreSuggestions));
-    Disconnect(idAddToDictionary, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(SpellCheckerPlugin::OnAddToPersonalDictionarie), NULL, this);
+    Disconnect(idAddToDictionary, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(SpellCheckerPlugin::OnAddToPersonalDictionary), NULL, this);
     Disconnect(idThesaurus,  wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(SpellCheckerPlugin::OnThesaurus));
     Disconnect(idThesaurus,  wxEVT_UPDATE_UI,             wxUpdateUIEventHandler(SpellCheckerPlugin::OnUpdateThesaurus));
 
+}
+void SpellCheckerPlugin::SavePersonalDictionary()
+{
+    HunspellInterface *hsi = dynamic_cast<HunspellInterface *>(m_pSpellChecker);
+    if (hsi) hsi->GetPersonalDictionary()->SavePersonalDictionary();
 }
 int SpellCheckerPlugin::Configure()
 {
@@ -457,10 +465,11 @@ void SpellCheckerPlugin::OnMoreSuggestions(wxCommandEvent &event)
 
 void SpellCheckerPlugin::ReloadSettings()
 {
+    SavePersonalDictionary();
     ConfigureHunspellSpellCheckEngine();
     m_pOnlineChecker->EnableOnlineChecks(m_sccfg->GetEnableOnlineChecker());
     ConfigureThesaurus();
-#ifdef CB_STATUS_BAR
+#ifdef wxUSE_STATUSBAR
     if (m_fld)
         m_fld->Update();
 #endif
@@ -472,7 +481,7 @@ cbConfigurationPanel *SpellCheckerPlugin::GetConfigurationPanel(wxWindow* parent
     return new SpellCheckSettingsPanel(parent, m_sccfg);
 }
 
-void SpellCheckerPlugin::OnAddToPersonalDictionarie(wxCommandEvent &event)
+void SpellCheckerPlugin::OnAddToPersonalDictionary(wxCommandEvent &event)
 {
     if ( m_wordstart == -1 || m_wordend == -1 ) return;
     cbEditor *ed = Manager::Get()->GetEditorManager()->GetBuiltinActiveEditor();

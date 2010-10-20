@@ -81,11 +81,11 @@ SpellCheckSettingsPanel::SpellCheckSettingsPanel(wxWindow* parent, SpellCheckerC
 	Button3->SetToolTip(_T("Select path to dictionary-switcher bitmaps (.png)"));
 
 
-    #ifndef CB_STATUS_BAR
-        // hide since they are not used atm
-        StaticText4->Hide();
-        m_TextBitmapPath->Hide();
-        Button3->Hide();
+    #ifndef wxUSE_STATUSBAR
+    // hide since they are not used atm
+    StaticText4->Hide();
+    m_TextBitmapPath->Hide();
+    Button3->Hide();
     #endif
 
 

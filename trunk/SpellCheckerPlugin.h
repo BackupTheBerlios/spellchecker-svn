@@ -111,7 +111,7 @@ class SpellCheckerPlugin : public cbPlugin
           */
         virtual bool BuildToolBar(wxToolBar* toolBar);
 
-        #ifdef CB_STATUS_BAR
+        #ifdef wxUSE_STATUSBAR
         virtual void CreateStatusField(cbStatusBar *bar);
         #endif
 
@@ -151,10 +151,12 @@ class SpellCheckerPlugin : public cbPlugin
         void OnThesaurus(wxCommandEvent &event);
         void OnReplaceBySuggestion(wxCommandEvent &event);
         void OnMoreSuggestions(wxCommandEvent &event);
-        void OnAddToPersonalDictionarie(wxCommandEvent &event);
+        void OnAddToPersonalDictionary(wxCommandEvent &event);
 
         void ConfigureHunspellSpellCheckEngine();
         void ConfigureThesaurus();
+        void ConfigurePersonalDictionary();
+        void SavePersonalDictionary();
 
         //void OnRightUpOverStatus(wxMouseEvent &event);
 
@@ -169,7 +171,7 @@ class SpellCheckerPlugin : public cbPlugin
 
         wxArrayString m_suggestions;
         int m_wordstart, m_wordend;
-#ifdef CB_STATUS_BAR
+#ifdef wxUSE_STATUSBAR
     private:
         SpellCheckerStatusField *m_fld;
 #endif
