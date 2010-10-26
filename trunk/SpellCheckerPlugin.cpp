@@ -94,11 +94,13 @@ void SpellCheckerPlugin::OnAttach()
     // is FALSE, it means that the application did *not* "load"
     // (see: does not need) this plugin...
 
-    DictionariesNeededDialog dlg;
-    dlg.ShowModal();
-
     // load configuration
     m_sccfg = new SpellCheckerConfig(this);
+
+    DictionariesNeededDialog dlg;
+    if (m_sccfg->GetPossibleDictionaries().empty())
+        dlg.ShowModal();
+
 
     //initialize spell checker
     if ( !m_pSpellingDialog )
