@@ -115,8 +115,9 @@ void OnlineSpellChecker::OnEditorChangeTextRange(cbEditor* ctrl, int start, int 
 
 void OnlineSpellChecker::DoSetIndications(cbEditor* ctrl)const
 {
-    cbStyledTextCtrl *stc = ctrl->GetLeftSplitViewControl();
     //Returns a pointer to the left (or top) split-view cbStyledTextCtrl. This function always returns a valid pointer.
+    cbStyledTextCtrl *stc = ctrl->GetLeftSplitViewControl();
+
     cbStyledTextCtrl *stcr =ctrl->GetRightSplitViewControl();
 
     // whatever the current state is, we've already done it once
@@ -145,15 +146,14 @@ void OnlineSpellChecker::DoSetIndications(cbEditor* ctrl)const
     // If wxWidgets is build without rawbitmap-support, the indicators become opaque
     // and hide the text, so we show them under the text.
     // Not enabled as default, because the readability is a little bit worse.
-    stc->IndicatorSetUnder(theIndicator,true);
+    stc->IndicatorSetUnder(GetIndicator(),true);
 #endif
     if ( stcr )
     {
-        stcr->SetIndicatorCurrent(GetIndicator());
         stcr->IndicatorSetStyle(GetIndicator(), wxSCI_INDIC_SQUIGGLE);
         stcr->IndicatorSetForeground(GetIndicator(), GetIndicatorColor() );
 #ifndef wxHAVE_RAW_BITMAP
-        stcr->IndicatorSetUnder(theIndicator,true);
+        stcr->IndicatorSetUnder(GetIndicator(),true);
 #endif
     }
 
