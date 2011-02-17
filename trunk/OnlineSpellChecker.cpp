@@ -1,6 +1,11 @@
 #include "OnlineSpellChecker.h"
 
 #include <sdk.h> // Code::Blocks SDK
+#ifndef CB_PRECOMP
+    #include <cbeditor.h>
+    #include <editormanager.h>
+    #include <manager.h>
+#endif
 #include <editorcolourset.h>
 #include <cbstyledtextctrl.h>
 #include "SpellCheckEngineInterface.h"

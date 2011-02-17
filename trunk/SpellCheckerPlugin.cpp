@@ -17,6 +17,11 @@
 *
 */
 #include <sdk.h> // Code::Blocks SDK
+#ifndef CB_PRECOMP
+    #include <configmanager.h>
+    #include <cbeditor.h>
+    #include <editormanager.h>
+#endif
 #include <configurationpanel.h>
 #include <editor_hooks.h>
 #include <cbstyledtextctrl.h>

@@ -19,6 +19,10 @@
 #include "SpellCheckHelper.h"
 
 #include <sdk.h> // Code::Blocks SDK
+#ifndef CB_PRECOMP
+    #include <configmanager.h>
+    #include <logmanager.h>
+#endif
 #include "SpellCheckerPlugin.h"
 SpellCheckHelper::SpellCheckHelper()
 {

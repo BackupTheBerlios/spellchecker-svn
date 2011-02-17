@@ -19,6 +19,10 @@
 #include "SpellCheckerConfig.h"
 #include "SpellCheckerPlugin.h"
 #include "sdk.h" // Code::Blocks SDK
+#ifndef CB_PRECOMP
+    #include <wx/dir.h>
+#endif
+
 #include "configmanager.h"
 
 #define CFG_SPELLCHECK_ENABLE_ONLINE_CHECK _T("/SpellChecker/EnableOnlineChecker")

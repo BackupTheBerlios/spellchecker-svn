@@ -66,7 +66,6 @@
 				<Option compiler="gcc" />
 				<Option parameters="--debug-log --no-check-associations -ns -nd" />
 				<Option host_application="..\..\..\devel\codeblocks.exe" />
-				<Option run_host_application_in_terminal="0" />
 				<Compiler>
 					<Add option="-g" />
 					<Add option="-pipe" />
@@ -90,7 +89,6 @@
 					<Add option="-Wl,--enable-auto-import" />
 					<Add library="wxSpellChecker" />
 					<Add library="hunspell" />
-					<Add library="wxscintilla" />
 					<Add library="codeblocks" />
 					<Add library="wxmsw28$(WX_SUFFIX)" />
 					<Add directory="..\..\..\devel" />
